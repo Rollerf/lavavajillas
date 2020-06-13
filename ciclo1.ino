@@ -1,21 +1,18 @@
-void ciclo1(){
-  if(sensorNivel->switchMode() && contadorNivel<6){
+void ciclo1() {
+  if (sensorNivel->switchMode(true) && contadorNivel < 6) {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(mRecirculacion, HIGH);
 
-    if(flagContadorNivel){
+    if (flagContadorNivel) {
       contadorNivel++;
     }
-  }else if(contadorNivel<6){
+  } else if (contadorNivel < 6) {
     digitalWrite(EV_EntradaAgua, HIGH);
     flagContadorNivel = true;
   }
 
-  if(contadorNivel>=6){
+  if (contadorNivel >= 6) {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(mRecirculacion, LOW);
-
-    
   }
-  
 }

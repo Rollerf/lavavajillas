@@ -57,7 +57,7 @@ float calculoNTC()
 {
   // variable para almacenar la temperatura y resistencia
   float sumaTemperaturas;
-  const byte numeroMuestras;
+  const byte numeroMuestras = 30;
   float temperaturaMedia;
 
   for (int i = 0; i <= numeroMuestras; i++) {
@@ -69,17 +69,17 @@ float calculoNTC()
     sumaTemperaturas += temperatura;
   }
 
-  temperaturaMedia = sumaTemperaturas/numeroMuestras;
+  temperaturaMedia = sumaTemperaturas / numeroMuestras;
   return temperaturaMedia;
 
   // imprimir resistencia y temperatura al monitor serial
   /*Serial.print(F("Resistencia del NTC: "));
-  Serial.print(resistencia);
-  Serial.print(" Temperatura: ");
-  Serial.println(temperatura, 1);
+    Serial.print(resistencia);
+    Serial.print(" Temperatura: ");
+    Serial.println(temperatura, 1);
 
-  // esperar 5 segundos entre las lecturas
-  delay(5000);*/
+    // esperar 5 segundos entre las lecturas
+    delay(5000);*/
 
 
 }
