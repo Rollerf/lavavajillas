@@ -1,13 +1,12 @@
 bool condicionesIniciales() {
   digitalWrite(EV_EntradaAgua, LOW);
-  digitalWrite(Calentador, LOW);
+  digitalWrite(calentador, LOW);
   digitalWrite(mRecirculacion, LOW);
-  digitalWrite(bVaciado, LOW);
-  digitalWrite(Calentador, LOW);
-  digitalWrite(mRecirculacion, LOW);
+  digitalWrite(aAbrillantador, LOW);
+  digitalWrite(regeneracionSal, LOW);
 
   //Comprobacion nivel de agua
-  if (sensorNivel->switchMode(true)) {
+  if (sensorNivel->switchMode(invertir)) {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(bVaciado, HIGH);
     setError(errorSensorNivel);
@@ -19,7 +18,7 @@ bool condicionesIniciales() {
   }
 
   //Comprobacion fuga de agua
-  if (sensorFugas->switchMode(true)) {
+  if (sensorFugas->switchMode(invertir)) {
     digitalWrite(EV_EntradaAgua, LOW);
     vaciado();
     setError(errorFugaAgua);
@@ -41,4 +40,16 @@ bool condicionesIniciales() {
 
   return true;
 }
+
 //Checkear sonda de temperatura. Que no tenga error
+bool checkSondaTemperatura() {
+  float temperatura = calculoNTC();
+
+  if (temperatura <= 5 || temperatura >= 100) {
+    setError(errorTemperatura);
+
+    return false;
+  }
+
+  return true;
+}

@@ -30,16 +30,20 @@ void clearErrors() {
   }
 }
 
-void showErrors() {
-  if (tVaciado->IN(true)) {
-    for (int i = 0; i < erroresLength; i++) {
-      if (errores[i] != "") {
-        printLine(errores[i], 1);
-        break;
-      }
+bool showErrors() {
+  for (int i = 0; i < erroresLength; i++) {
+    if (errores[i] != "") {
+      printLine(errores[i], 1);
+      return true;
     }
-  } else {
-    tVaciado->IN(false);
   }
+  return false;
+}
 
+bool searchError(String descripcionError) {
+  for (int i = 0; i < erroresLength; i++) {
+    if (descripcionError.compareTo(errores[i])) {
+      return true;
+    }
+  }
 }
