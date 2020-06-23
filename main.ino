@@ -14,6 +14,7 @@ TON* tRemojado;
 TON* tLavado;
 TON* tSecado;
 TON* tConfirmarPrograma;
+TON* tActivoNivelAgua;
 
 //Entradas
 Switches* sensorNivel;
@@ -48,12 +49,13 @@ LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 16 char
 
 //Flujo de programa
 bool marcha;
+bool finPrograma;
 char programa;
 int seleccionPrograma = 0;
 int etapa = 0;
 
 //Variables de proceso
-bool flagContadorNivel;
+bool flagActivoNivel;
 byte contadorNivel;
 
 //Constantes de proceso
@@ -68,17 +70,23 @@ const bool activar = true;
 const bool reset = false;
 const bool regeneracionActivada = true;
 const bool regeneracionDesactivada = false;
+const byte PRIMERA_LINEA = 0;
+const byte SEGUNDA_LINEA = 1;
 
 //Errores
 byte const erroresLength = 3;
 char* errores[erroresLength];
 bool aparatoError = false;
 
-//Constantes Errores
-const String errorFugaAgua = "Fuga de agua";
-const String errorSensorNivel = "Lavavajillas con nivel de agua";
-const String errorTemperatura = "Error de temperatura NTC";
-const String errorNivelAgua = "Timeout nivel de agua";
+//Constantes mensajes error
+const String ERROR_FUGA_AGUA = "Fuga de agua";
+const String ERROR_SENSOR_NIVEL = "Lavavajillas con nivel de agua";
+const String ERROR_TEMPERATURA_SONDA = "Error de temperatura NTC";
+const String ERROR_NIVEL_AGUA = "Timeout nivel de agua";
+
+//Constantes mensajes proceso
+const String PROGRAMA_ECO = "PROGRAMA ECO";
+const String PROGRAMA_FINALIZADO = "FIN DEL PROGRAMA";
 
 //Constantes temperatura
 const float alta = 80.0;
@@ -99,6 +107,7 @@ void setup() {
   tDisplayErrores = new TON(1000);
   tNivelAgua = new TON(45000);
   tMaximoNivelAgua = new TON(45000);
+  tActivoNivelAgua = new TON(3000);
   tRemojado = new TON(1200000);
   tLavado = new TON(1200000);
   tSecado = new TON(1200000);
@@ -124,7 +133,7 @@ void setup() {
 
 void loop() {
 
-  if (pulsadorMarcha->switchMode(invertir)) {
+  if (!marcha && pulsadorMarcha->switchMode(invertir)) {
     //TODO: recorrer menu y confirmar por duracion de pulsador
     while (pulsadorMarcha->switchMode(invertir)) {
       if (tConfirmarPrograma->IN(activar)) {
@@ -132,173 +141,39 @@ void loop() {
         tConfirmarPrograma->IN(reset);
       }
     }
-    if(!marcha){
+    if (!marcha) {
       seleccionPrograma++;
     }
   }
   tConfirmarPrograma->IN(reset);
 
-  while(marcha){
-    switch(seleccionPrograma){
+  if (marcha && sensorPuerta->switchMode(real) && !aparatoError) {
+    //TODO: Acabar el resto de programas
+    //TODO: Hacer seguridades y acciones de si se abre la puerta
+    //TODO: Checkear que estan todos los ciclos
+    //TODO: Modificar nombre de constantes por nombres en mayuscula separados con _
+    //TODO: Poner falses para poder probar el programa por partes
+    //TODO: Actualizar libreria temporizadores y switches con nuevas ideas
+    switch (seleccionPrograma) {
       case 1:
-
-      break;
+        finPrograma = eco();
+        printLine(PROGRAMA_ECO, PRIMERA_LINEA);
+        break;
 
       case 2:
 
-      break;
-    }
-  }
-
-  if (pulsadorMarcha->interlockButton(flancoBajada) && sensorPuerta->switchMode(real) && !aparatoError) {
-    switch (etapa) {
-      case 0:
-        if (condicionesIniciales()) {
-          etapa++;
-        }
-
-        break;
-
-      case 1:
-        if (interruptorPrograma1->switchMode(invertir)) {
-          //Setea los ajustes del programa 1 y muestra por pantalla que esta seleccionado
-          programa = 'E';
-          etapa++;
-
-        } else if (interruptorPrograma2->switchMode(invertir)) {
-          //Setea los ajustes del programa 2 y muestra por pantalla que esta seleccionado
-          programa = 'N';
-          etapa++;
-        }
-
-        break;
-
-      //CICLO 1
-
-      case 2:
-        //Llenado. Etapa2
-        //        if (llenado(frio, programa)) {
-        if (llenado(regeneracionDesactivada)) {
-          etapa++;
-        }
-
-        break;
-
-      case 3:
-        //Empezar con el primer ciclo. Etapa3
-        if (remojado()) {
-          etapa++;
-        }
-
-        break;
-
-      case 4:
-        //Vaciado. Etapa4
-        if (vaciado()) {
-          etapa++;
-        }
-
-        break;
-
-      //CICLO 2
-
-      case 5:
-        //Llenado. Etapa2
-        //        if (llenado(frio, programa)) {
-        if (llenado(regeneracionDesactivada)) {
-          etapa++;
-        }
-
-        break;
-
-      case 6:
-        //Empezar con el segundo ciclo. Etapa3
-        //TODO: Si el programa es el 'E' (econmomico) este lavado dura mas tiempo
-        if (lavado(programa)) {
-          etapa++;
-        }
-
-        break;
-
-      case 7:
-        //Vaciado. Etapa4
-        if (vaciado()) {
-          etapa++;
-        }
-
-        break;
-
-      //CICLO 3
-
-      case 8:
-        //Llenado. Etapa 8
-        //        if (llenado(frio, programa)) {
-        if (programa == 'E') {
-          etapa = 11;
-
-          break;
-        }
-        if (llenado(regeneracionDesactivada)) {
-          etapa++;
-        }
-
-        break;
-
-      case 9:
-        //Repetir segundo ciclo. Etapa 9
-        if (lavado(programa)) {
-          etapa++;
-        }
-
-        break;
-
-      case 10:
-        //Vaciado. Etapa 10
-        if (vaciado()) {
-          etapa++;
-        }
-
-        break;
-
-      //CICLO SECADO
-
-      case 11:
-        //Llenado. Etapa 11
-        //        if (llenado(frio, programa)) {
-        if (llenado(regeneracionActivada)) {
-          etapa++;
-        }
-
-        break;
-
-      case 12:
-        //Etapa 12
-        if (secado(programa)) {
-          etapa++;
-        }
-
-        break;
-
-      case 13:
-        //Vaciado. Etapa 13
-        if (vaciado()) {
-          etapa++;
-        }
-
         break;
     }
-  } else if (pulsadorMarcha->interlockButton(flancoBajada) && !sensorPuerta->switchMode(real)) {
+
+    if (finPrograma) {
+      marcha = false;
+      printLine(PROGRAMA_FINALIZADO, PRIMERA_LINEA);
+    }
+
+  } else if (marcha && !sensorPuerta->switchMode(real)) {
     parar();
     //TODO:Cuando se cierre de nuevo la puerta, continuar donde estaba el programa
     //reiniciando tiempos de ciclos si es que se encuentra en alguno
-  } else if (pulsadorMarcha->interlockButton(flancoBajada)) {
-    //Se para todo y se devuelve el programa al E0
-    if (condicionesIniciales()) {
-      etapa = 0;
-    }
-  } else if (!pulsadorMarcha->interlockButton(flancoBajada)) {
-    //Al apagar el aparato se resetean los errores
-    aparatoError = false;
   }
   //Checkear errores durante todo el programa
   if (tDisplayErrores->IN(activar)) {

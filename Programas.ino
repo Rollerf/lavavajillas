@@ -5,16 +5,15 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 1:
       //Llenado. Etapa2
-      //        if (llenado(frio, programa)) {
       if (llenado(regeneracionDesactivada)) {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 2:
       //Empezar con el primer ciclo. Etapa3
@@ -22,7 +21,7 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 3:
       //Vaciado. Etapa4
@@ -30,7 +29,7 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     //CICLO 2
 
@@ -40,16 +39,15 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 5:
       //Empezar con el segundo ciclo. Etapa3
-      //TODO: Si el programa es el 'E' (econmomico) este lavado dura mas tiempo
       if (lavado(programa)) {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 6:
       //Vaciado. Etapa4
@@ -57,23 +55,22 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     //CICLO 3
 
     case 7:
       //Llenado. Etapa 8
-      //        if (llenado(frio, programa)) {
       if (programa == 'E') {
         etapa = 11;
 
-        break;
+        return false;
       }
       if (llenado(regeneracionDesactivada)) {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 8:
       //Repetir segundo ciclo. Etapa 9
@@ -81,7 +78,7 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 9:
       //Vaciado. Etapa 10
@@ -89,18 +86,17 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     //CICLO SECADO
 
     case 10:
       //Llenado. Etapa 11
-      //        if (llenado(frio, programa)) {
       if (llenado(regeneracionActivada)) {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 11:
       //Etapa 12
@@ -108,7 +104,7 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     case 12:
       //Vaciado. Etapa 13
@@ -116,7 +112,7 @@ bool eco() {
         etapa++;
       }
 
-      break;
+      return false;
 
     //Fin del programa
     default:

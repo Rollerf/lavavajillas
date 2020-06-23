@@ -1,15 +1,3 @@
-/**
-   GeekFactory - "INNOVATING TOGETHER"
-   Distribucion de materiales para el desarrollo e innovacion tecnologica
-   www.geekfactory.mx
-
-   EJEMPLO SENCILLO PARA LECTURA DE TEMPERATURA CON TERMISTOR NTC. EL PROGRAMA
-   ESTÁ DISENADO PARA TERMISTORES NTC DE 10K NOMINALES A 25 GRADOS CENTIGRADOS.
-   EL TERMISTOR DEBE SER CONECTADO A LA ENTRADA DEL ADC MEDIANTE UN ARREGLO DE
-   DIVISOR RESISTIVO REALIZADO CON RESISTENCIA DE 10K Y EL TERMISTOR EN SERIE.
-   EL ALGORITMO UTILIZADO PARA OBTENER LA TEMPERATURA A PARTIR DE LA RESISTENCIA
-   DEL TERMISTOR ES UNA IMPLEMENTACIÓN DE LA ECUACIÓN DE STEINHART-HART
-*/
 #include <Arduino.h>
 #include <math.h>
 
@@ -18,25 +6,12 @@
 // configurar el valor de la resistencia que va en serie con el termistor NTC en ohms
 #define CONFIG_THERMISTOR_RESISTOR 9900l
 
-/**
-   @brief Obtiene la resistencia del termistor resolviendo el divisor resistivo.
-
-   @param adcval Valor medido por el convertidor analógico a digital.
-   @return int32_t Resistencia electrica del termistor.
-*/
 int32_t thermistor_get_resistance(uint16_t adcval)
 {
   // calculamos la resistencia del NTC a partir del valor del ADC
   return (CONFIG_THERMISTOR_RESISTOR * ((1023.0 / adcval) - 1));
 }
 
-/**
-   @brief Obtiene la temperatura en grados centigrados a partir de la resistencia
-   actual del componente.
-
-   @param resistance Resistencia actual del termistor.
-   @return float Temperatura en grados centigrados.
-*/
 float thermistor_get_temperature(int32_t resistance)
 {
   // variable de almacenamiento temporal, evita realizar varias veces el calculo de log
@@ -55,7 +30,6 @@ float thermistor_get_temperature(int32_t resistance)
 
 float calculoNTC()
 {
-  // variable para almacenar la temperatura y resistencia
   float sumaTemperaturas;
   const byte numeroMuestras = 30;
   float temperaturaMedia;
@@ -70,16 +44,6 @@ float calculoNTC()
   }
 
   temperaturaMedia = sumaTemperaturas / numeroMuestras;
+
   return temperaturaMedia;
-
-  // imprimir resistencia y temperatura al monitor serial
-  /*Serial.print(F("Resistencia del NTC: "));
-    Serial.print(resistencia);
-    Serial.print(" Temperatura: ");
-    Serial.println(temperatura, 1);
-
-    // esperar 5 segundos entre las lecturas
-    delay(5000);*/
-
-
 }

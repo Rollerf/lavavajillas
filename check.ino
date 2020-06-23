@@ -9,33 +9,33 @@ bool condicionesIniciales() {
   if (sensorNivel->switchMode(invertir)) {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(bVaciado, HIGH);
-    setError(errorSensorNivel);
+    setError(ERROR_SENSOR_NIVEL);
 
     return false;
   } else {
     digitalWrite(bVaciado, LOW);
-    clearError(errorSensorNivel);
+    clearError(ERROR_SENSOR_NIVEL);
   }
 
   //Comprobacion fuga de agua
   if (sensorFugas->switchMode(invertir)) {
     digitalWrite(EV_EntradaAgua, LOW);
     vaciado();
-    setError(errorFugaAgua);
+    setError(ERROR_FUGA_AGUA);
 
     return false;
   } else {
     digitalWrite(bVaciado, LOW);
-    clearError(errorFugaAgua);
+    clearError(ERROR_FUGA_AGUA);
   }
 
   //Comprobacion temperatura
   if (calculoNTC() <= 5 || calculoNTC() >= 35) {
-    setError(errorTemperatura);
+    setError(ERROR_TEMPERATURA_SONDA);
 
     return false;
   } else {
-    clearError(errorFugaAgua);
+    clearError(ERROR_FUGA_AGUA);
   }
 
   return true;
@@ -46,7 +46,7 @@ bool checkSondaTemperatura() {
   float temperatura = calculoNTC();
 
   if (temperatura <= 5 || temperatura >= 100) {
-    setError(errorTemperatura);
+    setError(ERROR_TEMPERATURA_SONDA);
 
     return false;
   }

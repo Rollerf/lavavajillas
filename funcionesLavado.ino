@@ -1,42 +1,42 @@
 bool llenado(bool regeneracion) {
   //TODO: Poder detectar filtro sucio con un tiempo o algo
-  //TODO: Resetear temporizador seguridad de llenado
-  //TODO: Cambiar el numero de intentos de llenado por que cuando solo llene durante 2s lo de por lleno.
   if (!tMaximoNivelAgua->IN(activar)) {
-    if (sensorNivel->switchMode(invertir) && contadorNivel < maximoLlenados) {
+    if (sensorNivel->switchMode(invertir)) {
       digitalWrite(EV_EntradaAgua, LOW);
       digitalWrite(regeneracionSal, LOW);
       digitalWrite(mRecirculacion, HIGH);
 
-      if (flagContadorNivel) {
-        contadorNivel++;
-        flagContadorNivel = false;
+      if (!flagActivoNivel) {
+        tMaximoNivelAgua->IN(reset);
+        tNivelAgua->IN(reset);
+        tActivoNivelAgua->IN(reset);
+        return true;
       }
-    } else if (contadorNivel < maximoLlenados) {
+    } else {
       digitalWrite(EV_EntradaAgua, HIGH);
+
       if (regeneracion) {
         digitalWrite(regeneracionSal, HIGH);
       }
-      flagContadorNivel = true;
       if (tNivelAgua->IN(activar)) {
-        setError(errorNivelAgua);
+        setError(ERROR_NIVEL_AGUA);
+        tMaximoNivelAgua->IN(reset);
+        tActivoNivelAgua->IN(reset);
         tNivelAgua->IN(reset);
+
+        return false;
       }
-    }
 
-    if (contadorNivel == maximoLlenados) {
-      digitalWrite(EV_EntradaAgua, LOW);
-      digitalWrite(regeneracionSal, LOW);
-      digitalWrite(mRecirculacion, HIGH);
-
-      return true;
+      flagActivoNivel = tActivoNivelAgua->IN(activar);
     }
 
     return false;
 
   } else {
-    setError(errorNivelAgua);
+    setError(ERROR_NIVEL_AGUA);
     tMaximoNivelAgua->IN(reset);
+    tNivelAgua->IN(reset);
+    tActivoNivelAgua->IN(reset);
 
     return false;
   }
@@ -49,7 +49,7 @@ bool vaciado() {
     digitalWrite(bVaciado, LOW);
 
     if (sensorNivel->switchMode(true)) {
-      setError(errorNivelAgua);
+      setError(ERROR_NIVEL_AGUA);
 
       return false;
     }
