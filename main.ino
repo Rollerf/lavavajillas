@@ -10,11 +10,9 @@ TON* tVaciado;
 TON* tDisplayErrores;
 TON* tNivelAgua;
 TON* tMaximoNivelAgua;
-TON* tRemojado;
-TON* tLavado;
-TON* tSecado;
 TON* tConfirmarPrograma;
 TON* tActivoNivelAgua;
+TON* tCiclo;
 
 //Entradas
 Switches* sensorNivel;
@@ -89,8 +87,10 @@ const String PROGRAMA_ECO = "PROGRAMA ECO";
 const String PROGRAMA_FINALIZADO = "FIN DEL PROGRAMA";
 
 //Constantes temperatura
-const float alta = 80.0;
-const float media = 70.0;
+const float SEVENTY = 70.0;
+const float SIXTY = 60.0;
+const float FIFTY = 50.0;
+const float FORTY_FIVE = 45.0;
 
 void setup() {
   //Entradas digitales:
@@ -108,9 +108,7 @@ void setup() {
   tNivelAgua = new TON(45000);
   tMaximoNivelAgua = new TON(45000);
   tActivoNivelAgua = new TON(3000);
-  tRemojado = new TON(1200000);
-  tLavado = new TON(1200000);
-  tSecado = new TON(1200000);
+  tCiclo = new TON(1200000);
   tConfirmarPrograma = new TON(3000);
 
   //Switches

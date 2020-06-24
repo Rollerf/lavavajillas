@@ -17,6 +17,7 @@ bool eco() {
 
     case 2:
       //Empezar con el primer ciclo. Etapa3
+      tCiclo->setSetPoint(480000);
       if (remojado()) {
         etapa++;
       }
@@ -43,7 +44,8 @@ bool eco() {
 
     case 5:
       //Empezar con el segundo ciclo. Etapa3
-      if (lavado(programa)) {
+      tCiclo->setSetPoint(600000);
+      if (lavado(FIFTY)) {
         etapa++;
       }
 
@@ -74,7 +76,8 @@ bool eco() {
 
     case 8:
       //Repetir segundo ciclo. Etapa 9
-      if (lavado(programa)) {
+      tCiclo->setSetPoint(390000);
+      if (abrillantado(FIFTY)) {
         etapa++;
       }
 
@@ -100,7 +103,8 @@ bool eco() {
 
     case 11:
       //Etapa 12
-      if (secado(programa)) {
+      tCiclo->setSetPoint(390000);
+      if (secado(SIXTY)) {
         etapa++;
       }
 

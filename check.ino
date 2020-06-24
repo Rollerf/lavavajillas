@@ -45,7 +45,7 @@ bool condicionesIniciales() {
 bool checkSondaTemperatura() {
   float temperatura = calculoNTC();
 
-  if (temperatura <= 5 || temperatura >= 100) {
+  if (temperatura <= 5.0 || temperatura >= 80.0) {
     setError(ERROR_TEMPERATURA_SONDA);
 
     return false;

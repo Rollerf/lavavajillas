@@ -1,7 +1,7 @@
 bool remojado() {
-  if (tRemojado->IN(activar)) {
+  if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
-    tRemojado->IN(reset);
+    tCiclo->IN(reset);
 
     return false;
   } else {
@@ -13,43 +13,48 @@ bool remojado() {
   }
 }
 
-bool lavado(char programa) {
-  if (tLavado->IN(activar)) {
+bool lavado(float temperatura) {
+  if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
-    tLavado->IN(reset);
+    tCiclo->IN(reset);
 
     return false;
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(mRecirculacion, HIGH);
-
-    if (programa == 'E') {
-      calentar(media);
-    } else if (programa == 'N') {
-      calentar(alta);
-    }
+    calentar(temperatura);
 
     return false;
   }
 }
 
-bool secado(char programa) {
-  if (tSecado->IN(activar)) {
+bool abrillantado(float temperatura) {
+  if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
     digitalWrite(aAbrillantador, LOW);
-    tSecado->IN(reset);
+    tCiclo->IN(reset);
 
     return false;
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(mRecirculacion, HIGH);
     digitalWrite(aAbrillantador, HIGH);
+    calentar(temperatura);
 
-    if (programa == 'E') {
-      calentar(media);
-    } else if (programa == 'N') {
-      calentar(alta);
-    }
+    return false;
+  }
+}
+
+bool secado(float temperatura) {
+  if (tCiclo->IN(activar)) {
+    digitalWrite(mRecirculacion, LOW);
+    tCiclo->IN(reset);
+
+    return false;
+  } else {
+    digitalWrite(EV_EntradaAgua, LOW);
+    digitalWrite(mRecirculacion, HIGH);
+    calentar(temperatura);
 
     return false;
   }
