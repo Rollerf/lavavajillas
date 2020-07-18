@@ -26,13 +26,11 @@ Switches* sensorPuerta;
 LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 //Entradas Digitales
-#define pMarcha 7
-#define pPrograma1 8
-#define pPrograma2 9
-#define pResetMemoria 10
-#define sNivel 11
-#define sFugas 12
-#define sPuerta 13
+#define pMarcha 9
+#define sNivel 10
+#define sFugas 11
+#define sSal 12
+#define sPuerta 8
 
 //Entradas analogicas
 #define sNTC A0
@@ -65,7 +63,7 @@ const bool real = false;
 const bool flancoSubida = false;
 const bool flancoBajada = true;
 const bool activar = true;
-const bool reset = false;
+const bool resetTimer = false;
 const bool regeneracionActivada = true;
 const bool regeneracionDesactivada = false;
 const byte PRIMERA_LINEA = 0;
@@ -94,7 +92,7 @@ const float FORTY_FIVE = 45.0;
 
 void setup() {
   //Entradas digitales:
-  for (byte i = 0; i <= 12; i++)
+  for (byte i = 9; i <= 12; i++)
     pinMode(i, INPUT_PULLUP);
   pinMode(sPuerta, INPUT);
 
@@ -106,7 +104,7 @@ void setup() {
   tVaciado = new TON(40000);
   tDisplayErrores = new TON(1000);
   tNivelAgua = new TON(45000);
-  tMaximoNivelAgua = new TON(45000);
+  tMaximoNivelAgua = new TON(300000);
   tActivoNivelAgua = new TON(3000);
   tCiclo = new TON(1200000);
   tConfirmarPrograma = new TON(3000);
@@ -114,8 +112,6 @@ void setup() {
   //Switches
   sensorNivel = new Switches(50, sNivel);
   pulsadorMarcha = new Switches(50, pMarcha);
-  interruptorPrograma1 = new Switches(50, pPrograma1);
-  interruptorPrograma2 = new Switches(50, pPrograma2);
   sensorFugas = new Switches(50, sFugas);
   sensorPuerta = new Switches(50, sPuerta);
 
@@ -132,26 +128,24 @@ void setup() {
 void loop() {
 
   if (!marcha && pulsadorMarcha->switchMode(invertir)) {
-    //TODO: recorrer menu y confirmar por duracion de pulsador
     while (pulsadorMarcha->switchMode(invertir)) {
       if (tConfirmarPrograma->IN(activar)) {
         marcha = true;
-        tConfirmarPrograma->IN(reset);
+        tConfirmarPrograma->IN(resetTimer);
       }
     }
     if (!marcha) {
       seleccionPrograma++;
     }
   }
-  tConfirmarPrograma->IN(reset);
+  tConfirmarPrograma->IN(resetTimer);
 
-  if (marcha && sensorPuerta->switchMode(real) && !aparatoError) {
+  if (marcha && sensorPuerta->buttonMode(real) && !aparatoError) {
     //TODO: Acabar el resto de programas
     //TODO: Hacer seguridades y acciones de si se abre la puerta
     //TODO: Checkear que estan todos los ciclos
     //TODO: Modificar nombre de constantes por nombres en mayuscula separados con _
     //TODO: Poner falses para poder probar el programa por partes
-    //TODO: Actualizar libreria temporizadores y switches con nuevas ideas
     switch (seleccionPrograma) {
       case 1:
         finPrograma = eco();
@@ -168,7 +162,7 @@ void loop() {
       printLine(PROGRAMA_FINALIZADO, PRIMERA_LINEA);
     }
 
-  } else if (marcha && !sensorPuerta->switchMode(real)) {
+  } else if (marcha && !sensorPuerta->buttonMode(real)) {
     parar();
     //TODO:Cuando se cierre de nuevo la puerta, continuar donde estaba el programa
     //reiniciando tiempos de ciclos si es que se encuentra en alguno
@@ -180,6 +174,6 @@ void loop() {
       aparatoError = true;
       etapa = 0;
     }
-    tDisplayErrores->IN(reset);
+    tDisplayErrores->IN(resetTimer);
   }
 }

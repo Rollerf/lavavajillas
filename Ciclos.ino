@@ -1,7 +1,7 @@
 bool remojado() {
   if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
-    tCiclo->IN(reset);
+    tCiclo->IN(resetTimer);
 
     return false;
   } else {
@@ -16,7 +16,7 @@ bool remojado() {
 bool lavado(float temperatura) {
   if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
-    tCiclo->IN(reset);
+    tCiclo->IN(resetTimer);
 
     return false;
   } else {
@@ -32,7 +32,7 @@ bool abrillantado(float temperatura) {
   if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
     digitalWrite(aAbrillantador, LOW);
-    tCiclo->IN(reset);
+    tCiclo->IN(resetTimer);
 
     return false;
   } else {
@@ -48,7 +48,7 @@ bool abrillantado(float temperatura) {
 bool secado(float temperatura) {
   if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
-    tCiclo->IN(reset);
+    tCiclo->IN(resetTimer);
 
     return false;
   } else {

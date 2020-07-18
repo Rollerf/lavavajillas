@@ -7,9 +7,9 @@ bool llenado(bool regeneracion) {
       digitalWrite(mRecirculacion, HIGH);
 
       if (!flagActivoNivel) {
-        tMaximoNivelAgua->IN(reset);
-        tNivelAgua->IN(reset);
-        tActivoNivelAgua->IN(reset);
+        tMaximoNivelAgua->IN(resetTimer);
+        tNivelAgua->IN(resetTimer);
+        tActivoNivelAgua->IN(resetTimer);
         return true;
       }
     } else {
@@ -20,9 +20,9 @@ bool llenado(bool regeneracion) {
       }
       if (tNivelAgua->IN(activar)) {
         setError(ERROR_NIVEL_AGUA);
-        tMaximoNivelAgua->IN(reset);
-        tActivoNivelAgua->IN(reset);
-        tNivelAgua->IN(reset);
+        tMaximoNivelAgua->IN(resetTimer);
+        tActivoNivelAgua->IN(resetTimer);
+        tNivelAgua->IN(resetTimer);
 
         return false;
       }
@@ -34,9 +34,9 @@ bool llenado(bool regeneracion) {
 
   } else {
     setError(ERROR_NIVEL_AGUA);
-    tMaximoNivelAgua->IN(reset);
-    tNivelAgua->IN(reset);
-    tActivoNivelAgua->IN(reset);
+    tMaximoNivelAgua->IN(resetTimer);
+    tNivelAgua->IN(resetTimer);
+    tActivoNivelAgua->IN(resetTimer);
 
     return false;
   }
@@ -54,7 +54,7 @@ bool vaciado() {
       return false;
     }
 
-    tVaciado->IN(reset);
+    tVaciado->IN(resetTimer);
 
     return true;
   }
