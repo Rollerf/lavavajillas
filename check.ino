@@ -1,4 +1,5 @@
 bool condicionesIniciales() {
+  Serial.println("Checkeo Inicial");
   digitalWrite(EV_EntradaAgua, LOW);
   digitalWrite(calentador, LOW);
   digitalWrite(mRecirculacion, LOW);
@@ -44,7 +45,8 @@ bool condicionesIniciales() {
 //Checkear sonda de temperatura. Que no tenga error
 bool checkSondaTemperatura() {
   float temperatura = calculoNTC();
-
+  Serial.print("Temperatura:");
+  Serial.println(temperatura);
   if (temperatura <= 5.0 || temperatura >= 80.0) {
     setError(ERROR_TEMPERATURA_SONDA);
 

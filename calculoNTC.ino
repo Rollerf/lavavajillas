@@ -4,46 +4,35 @@
 // configurar el pin utilizado para la medicion de voltaje del divisor resistivo del NTC
 #define CONFIG_THERMISTOR_ADC_PIN A0
 // configurar el valor de la resistencia que va en serie con el termistor NTC en ohms
-#define CONFIG_THERMISTOR_RESISTOR 9900l
+#define CONFIG_THERMISTOR_RESISTOR 4700
+//Numero de muestras para hacer la media
+#define NUMERO_MUESTRAS 30
 
-int32_t thermistor_get_resistance(uint16_t adcval)
-{
-  // calculamos la resistencia del NTC a partir del valor del ADC
-  return (CONFIG_THERMISTOR_RESISTOR * ((1023.0 / adcval) - 1));
-}
-
-float thermistor_get_temperature(int32_t resistance)
-{
-  // variable de almacenamiento temporal, evita realizar varias veces el calculo de log
-  float temp;
-
-  // calculamos logaritmo natural, se almacena en variable para varios calculos
-  temp = log(resistance);
-
-  // resolvemos la ecuacion de STEINHART-HART
-  // http://en.wikipedia.org/wiki/Steinhart–Hart_equation
-  temp = 1 / (0.001129148 + (0.000234125 * temp) + (0.0000000876741 * temp * temp * temp));
-
-  // convertir el resultado de kelvin a centigrados y retornar
-  return temp - 273.15;
-}
+const float A = 1.11492089e-3;
+const float B = 2.372075385e-4;
+const float C = 6.954079529e-8;
+const float K = 2.5; //factor de disipacion en mW/C
+const int Vcc = 5;
 
 float calculoNTC()
 {
-  float sumaTemperaturas;
-  const byte numeroMuestras = 30;
-  float temperaturaMedia;
+  float raw;
+  float V;
+  float sumaResistencias;
 
-  for (int i = 0; i <= numeroMuestras; i++) {
-    // calcular la resistencia electrica del termistor usando la lectura del ADC
-    uint32_t resistencia = thermistor_get_resistance(analogRead(CONFIG_THERMISTOR_ADC_PIN));
-    // luego calcular la temperatura segun dicha resistencia
-    float temperatura = thermistor_get_temperature(resistencia);
+  for (int i = 0; i <= NUMERO_MUESTRAS; i++) {
+    float raw = analogRead(CONFIG_THERMISTOR_ADC_PIN);
+    float V =  raw / 1024 * Vcc;
+    float R = (CONFIG_THERMISTOR_RESISTOR * V ) / (Vcc - V);
 
-    sumaTemperaturas += temperatura;
+    sumaResistencias += R;
   }
 
-  temperaturaMedia = sumaTemperaturas / numeroMuestras;
+  float R = sumaResistencias / NUMERO_MUESTRAS;
 
-  return temperaturaMedia;
+  float logR  = log(R);
+  float R_th = 1.0 / (A + B * logR + C * logR * logR * logR );
+  float kelvin = R_th - V * V / (K * R) * 1000;
+
+  return kelvin - 273.15;
 }

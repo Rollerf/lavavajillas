@@ -26,11 +26,11 @@ Switches* sensorPuerta;
 LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 //Entradas Digitales
-#define pMarcha 9
+#define pMarcha 8
+#define sPuerta 9
 #define sNivel 10
 #define sFugas 11
 #define sSal 12
-#define sPuerta 8
 
 //Entradas analogicas
 #define sNTC A0
@@ -55,7 +55,6 @@ bool flagActivoNivel;
 byte contadorNivel;
 
 //Constantes de proceso
-const byte maximoLlenados = 6;
 const bool caliente = true;
 const bool frio = false;
 const bool invertir = true;
@@ -75,13 +74,16 @@ char* errores[erroresLength];
 bool aparatoError = false;
 
 //Constantes mensajes error
+//OJO:No pueden tener mas de 16 caracteres
 const String ERROR_FUGA_AGUA = "Fuga de agua";
-const String ERROR_SENSOR_NIVEL = "Lavavajillas con nivel de agua";
-const String ERROR_TEMPERATURA_SONDA = "Error de temperatura NTC";
-const String ERROR_NIVEL_AGUA = "Timeout nivel de agua";
+const String ERROR_SENSOR_NIVEL = "Nivel agua ALTO";
+const String ERROR_TEMPERATURA_SONDA = "Error NTC";
+const String ERROR_NIVEL_AGUA = "Timeout nivel agua";
 
 //Constantes mensajes proceso
-const String PROGRAMA_ECO = "PROGRAMA ECO";
+const String PROGRAMA_ECO = "PRG ECO";
+const String PROGRAMA_NORMAL = "PRG NORMAL";
+const String PROGRAMA_ESPERA = "ESPERA PRG";
 const String PROGRAMA_FINALIZADO = "FIN DEL PROGRAMA";
 
 //Constantes temperatura
@@ -92,8 +94,9 @@ const float FORTY_FIVE = 45.0;
 
 void setup() {
   //Entradas digitales:
-  for (byte i = 9; i <= 12; i++)
+  for (byte i = 10; i <= 12; i++)
     pinMode(i, INPUT_PULLUP);
+  pinMode(pMarcha, INPUT_PULLUP);
   pinMode(sPuerta, INPUT);
 
   //Salidas digitales:
@@ -102,7 +105,7 @@ void setup() {
 
   //Temporizadores:
   tVaciado = new TON(40000);
-  tDisplayErrores = new TON(1000);
+  tDisplayErrores = new TON(3000);
   tNivelAgua = new TON(45000);
   tMaximoNivelAgua = new TON(300000);
   tActivoNivelAgua = new TON(3000);
@@ -124,23 +127,37 @@ void setup() {
   lcd.home();
   lcd.print("LAVAVAJILLAS FAGOR");
 }
-
+//TODO: Arreglar problema de la temperatura
 void loop() {
-
-  if (!marcha && pulsadorMarcha->switchMode(invertir)) {
-    while (pulsadorMarcha->switchMode(invertir)) {
+  if (!marcha && pulsadorMarcha->buttonMode(invertir)) {
+    while (pulsadorMarcha->buttonMode(invertir)) {
       if (tConfirmarPrograma->IN(activar)) {
         marcha = true;
         tConfirmarPrograma->IN(resetTimer);
+        Serial.println("Confirmando programa");
       }
     }
     if (!marcha) {
       seleccionPrograma++;
+      Serial.println("Seleccionar programa");
     }
   }
   tConfirmarPrograma->IN(resetTimer);
 
-  if (marcha && sensorPuerta->buttonMode(real) && !aparatoError) {
+  switch (seleccionPrograma) {
+    case 1:
+      printLine(PROGRAMA_ECO, PRIMERA_LINEA);
+      break;
+    case 2:
+      printLine(PROGRAMA_NORMAL, PRIMERA_LINEA);
+      break;
+    default:
+      printLine(PROGRAMA_ESPERA, PRIMERA_LINEA);
+      break;
+  }
+
+  if (marcha && sensorPuerta->switchMode(real) && !aparatoError) {
+    Serial.println("Arranque");
     //TODO: Acabar el resto de programas
     //TODO: Hacer seguridades y acciones de si se abre la puerta
     //TODO: Checkear que estan todos los ciclos
@@ -150,6 +167,7 @@ void loop() {
       case 1:
         finPrograma = eco();
         printLine(PROGRAMA_ECO, PRIMERA_LINEA);
+        Serial.println("Programa ECO impresion por pantalla");
         break;
 
       case 2:
@@ -162,15 +180,16 @@ void loop() {
       printLine(PROGRAMA_FINALIZADO, PRIMERA_LINEA);
     }
 
-  } else if (marcha && !sensorPuerta->buttonMode(real)) {
+  } else if (marcha && !sensorPuerta->switchMode(real)) {
+    Serial.println("Marcha y puerta abierta");
     parar();
-    //TODO:Cuando se cierre de nuevo la puerta, continuar donde estaba el programa
-    //reiniciando tiempos de ciclos si es que se encuentra en alguno
+    resetTimers();
   }
   //Checkear errores durante todo el programa
   if (tDisplayErrores->IN(activar)) {
     checkSondaTemperatura();
     if (showErrors()) {
+      Serial.println("Hay errores");
       aparatoError = true;
       etapa = 0;
     }
