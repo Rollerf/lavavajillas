@@ -67,11 +67,18 @@ const bool regeneracionActivada = true;
 const bool regeneracionDesactivada = false;
 const byte PRIMERA_LINEA = 0;
 const byte SEGUNDA_LINEA = 1;
+const String LINEA_VACIA = "                ";
 
 //Errores
 byte const erroresLength = 3;
-char* errores[erroresLength];
+//char* errores[erroresLength]; No funciona con esta declaracion
+char* errores[] = {0, 0, 0, 0};
 bool aparatoError = false;
+
+const char CHAR_ERROR_FUGA_AGUA = 'A';
+const char CHAR_ERROR_SENSOR_NIVEL = 'B';
+const char CHAR_ERROR_TEMPERATURA_SONDA = 'C';
+const char CHAR_ERROR_NIVEL_AGUA = 'D';
 
 //Constantes mensajes error
 //OJO:No pueden tener mas de 16 caracteres
@@ -125,11 +132,13 @@ void setup() {
   lcd.init();
   lcd.backlight(); //lcd.noBacklight();
   lcd.home();
-  lcd.print("LAVAVAJILLAS FAGOR");
+  lcd.print("FAGOR");
+  while (!Serial);
+  clearErrors();
 }
 //TODO: Arreglar problema de la temperatura
 void loop() {
-  if (!marcha && pulsadorMarcha->buttonMode(invertir)) {
+  if (condicionesIniciales() && !marcha && pulsadorMarcha->buttonMode(invertir) && !aparatoError) {
     while (pulsadorMarcha->buttonMode(invertir)) {
       if (tConfirmarPrograma->IN(activar)) {
         marcha = true;
@@ -140,21 +149,21 @@ void loop() {
     if (!marcha) {
       seleccionPrograma++;
       Serial.println("Seleccionar programa");
+      switch (seleccionPrograma) {
+        case 1:
+          printLine(PROGRAMA_ECO, PRIMERA_LINEA);
+          break;
+        case 2:
+          printLine(PROGRAMA_NORMAL, PRIMERA_LINEA);
+          break;
+        default:
+          printLine(PROGRAMA_ESPERA, PRIMERA_LINEA);
+          seleccionPrograma = 0;
+          break;
+      }
     }
   }
   tConfirmarPrograma->IN(resetTimer);
-
-  switch (seleccionPrograma) {
-    case 1:
-      printLine(PROGRAMA_ECO, PRIMERA_LINEA);
-      break;
-    case 2:
-      printLine(PROGRAMA_NORMAL, PRIMERA_LINEA);
-      break;
-    default:
-      printLine(PROGRAMA_ESPERA, PRIMERA_LINEA);
-      break;
-  }
 
   if (marcha && sensorPuerta->switchMode(real) && !aparatoError) {
     Serial.println("Arranque");
@@ -166,8 +175,7 @@ void loop() {
     switch (seleccionPrograma) {
       case 1:
         finPrograma = eco();
-        printLine(PROGRAMA_ECO, PRIMERA_LINEA);
-        Serial.println("Programa ECO impresion por pantalla");
+        Serial.println("Programa ECO arranque");
         break;
 
       case 2:
@@ -188,6 +196,7 @@ void loop() {
   //Checkear errores durante todo el programa
   if (tDisplayErrores->IN(activar)) {
     checkSondaTemperatura();
+    checkFugas();
     if (showErrors()) {
       Serial.println("Hay errores");
       aparatoError = true;

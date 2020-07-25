@@ -1,5 +1,4 @@
 bool condicionesIniciales() {
-  Serial.println("Checkeo Inicial");
   digitalWrite(EV_EntradaAgua, LOW);
   digitalWrite(calentador, LOW);
   digitalWrite(mRecirculacion, LOW);
@@ -10,33 +9,36 @@ bool condicionesIniciales() {
   if (sensorNivel->switchMode(invertir)) {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(bVaciado, HIGH);
-    setError(ERROR_SENSOR_NIVEL);
+    Serial.println("Error, nivel de agua alto");
+    setError(CHAR_ERROR_SENSOR_NIVEL);
 
     return false;
   } else {
     digitalWrite(bVaciado, LOW);
-    clearError(ERROR_SENSOR_NIVEL);
+    clearError(CHAR_ERROR_SENSOR_NIVEL);
   }
 
   //Comprobacion fuga de agua
-  if (sensorFugas->switchMode(invertir)) {
+  if (sensorFugas->switchMode(real)) {
     digitalWrite(EV_EntradaAgua, LOW);
     vaciado();
-    setError(ERROR_FUGA_AGUA);
+    Serial.println("Error, fuga de agua");
+    setError(CHAR_ERROR_FUGA_AGUA);
 
     return false;
   } else {
     digitalWrite(bVaciado, LOW);
-    clearError(ERROR_FUGA_AGUA);
+    clearError(CHAR_ERROR_FUGA_AGUA);
   }
 
   //Comprobacion temperatura
-  if (calculoNTC() <= 5 || calculoNTC() >= 35) {
-    setError(ERROR_TEMPERATURA_SONDA);
+  if (calculoNTC() <= 5 || calculoNTC() >= 40) {
+    Serial.println("Seteo erro temperatura sonda");
+    setError(CHAR_ERROR_TEMPERATURA_SONDA);
 
     return false;
   } else {
-    clearError(ERROR_FUGA_AGUA);
+    clearError(CHAR_ERROR_FUGA_AGUA);
   }
 
   return true;
@@ -48,10 +50,31 @@ bool checkSondaTemperatura() {
   Serial.print("Temperatura:");
   Serial.println(temperatura);
   if (temperatura <= 5.0 || temperatura >= 80.0) {
-    setError(ERROR_TEMPERATURA_SONDA);
-
+    setError(CHAR_ERROR_TEMPERATURA_SONDA);
+    Serial.println("Seteo error temperatura sonda");
     return false;
   }
 
   return true;
+}
+
+bool checkFugas() {
+  //Comprobacion fuga de agua
+  static bool vacio;
+  if (sensorFugas->switchMode(real) && !vacio) {
+    digitalWrite(EV_EntradaAgua, LOW);
+    vacio = vaciado();
+    Serial.println("Error, fuga de agua");
+    setError(CHAR_ERROR_FUGA_AGUA);
+
+    return true;
+
+  } else if (sensorFugas->switchMode(real) && vacio) {
+
+    return true;
+
+  } else {
+
+    return false;
+  }
 }

@@ -19,7 +19,7 @@ bool llenado(bool regeneracion) {
         digitalWrite(regeneracionSal, HIGH);
       }
       if (tNivelAgua->IN(activar)) {
-        setError(ERROR_NIVEL_AGUA);
+        setError(CHAR_ERROR_NIVEL_AGUA);
         tMaximoNivelAgua->IN(resetTimer);
         tActivoNivelAgua->IN(resetTimer);
         tNivelAgua->IN(resetTimer);
@@ -33,7 +33,7 @@ bool llenado(bool regeneracion) {
     return false;
 
   } else {
-    setError(ERROR_NIVEL_AGUA);
+    setError(CHAR_ERROR_NIVEL_AGUA);
     tMaximoNivelAgua->IN(resetTimer);
     tNivelAgua->IN(resetTimer);
     tActivoNivelAgua->IN(resetTimer);
@@ -42,14 +42,15 @@ bool llenado(bool regeneracion) {
   }
 
 }
-
+//Vacia durante un tiempo.
+//Devuelve true pasado ese tiempo si el sensor no detecta nivel de agua
 bool vaciado() {
 
   if (tVaciado->IN(activar)) {
     digitalWrite(bVaciado, LOW);
 
     if (sensorNivel->switchMode(true)) {
-      setError(ERROR_NIVEL_AGUA);
+      setError(CHAR_ERROR_NIVEL_AGUA);
 
       return false;
     }
@@ -60,6 +61,7 @@ bool vaciado() {
   }
 
   else {
+    digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(bVaciado, HIGH);
 
     return false;
