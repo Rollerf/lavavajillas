@@ -94,7 +94,9 @@ bool prgLavado(char programaSeleccionado) {
     case 3:
       //Vaciado. Etapa 3
       if (vaciado()) {
-        etapa++;
+        //Se modifica para probar hasta aqui
+        //etapa++;
+        etapa = 10;
         Serial.println("Vacio");
       }
 
@@ -178,7 +180,7 @@ bool prgLavado(char programaSeleccionado) {
     case 11:
       //Etapa 11
       if (secado()) {
-        tVaciado->setSetPoint(TIME_VACIADO_SECADO);
+        //tVaciado->setSetPoint(TIME_VACIADO_SECADO);
 
         etapa++;
         Serial.println("Secado completo");
@@ -188,9 +190,11 @@ bool prgLavado(char programaSeleccionado) {
 
     case 12:
       //Vaciado. Etapa 12
-      if (vaciado()) {
-        etapa++;
-      }
+      //      if (vaciado()) {
+      //        etapa++;
+      //      }
+
+      etapa++;
 
       return false;
 

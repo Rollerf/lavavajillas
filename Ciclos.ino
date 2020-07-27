@@ -11,7 +11,7 @@ bool remojado() {
     digitalWrite(calentador, LOW);
     digitalWrite(mRecirculacion, HIGH);
 
-    printLine(CICLO_LLENANDO, SEGUNDA_LINEA);
+    printLine(CICLO_REMOJANDO, SEGUNDA_LINEA);
 
     return false;
   }

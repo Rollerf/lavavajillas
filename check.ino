@@ -33,7 +33,9 @@ bool condicionesIniciales() {
 
   //Comprobacion temperatura
   if (calculoNTC() <= 5 || calculoNTC() >= 40) {
-    Serial.println("Seteo erro temperatura sonda");
+    Serial.println("Seteo error temperatura sonda");
+    Serial.println("Temperatura: ");
+    Serial.println(calculoNTC());
     setError(CHAR_ERROR_TEMPERATURA_SONDA);
 
     return false;
@@ -47,7 +49,7 @@ bool condicionesIniciales() {
 //Checkear sonda de temperatura. Que no tenga error
 bool checkSondaTemperatura() {
   float temperatura = calculoNTC();
-  Serial.print("Temperatura:");
+  Serial.print("checkTemperatura:");
   Serial.println(temperatura);
   if (temperatura <= 5.0 || temperatura >= 80.0) {
     setError(CHAR_ERROR_TEMPERATURA_SONDA);

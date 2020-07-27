@@ -37,7 +37,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 16 char
 
 //Salidas digitales
 #define EV_EntradaAgua 2
-#define calentador 3
+#define calentador 13//Seria el 3. Se cambia al 13 para empezar pruebas
 #define mRecirculacion 4
 #define bVaciado 5
 #define aAbrillantador 6
@@ -103,39 +103,40 @@ const String CICLO_REMOJANDO = "REMOJANDO";
 const String CICLO_LAVANDO = "LAVANDO";
 const String CICLO_ABRILLANTANDO = "ABRILLANTANDO";
 const String CICLO_SECANDO = "SECANDO";
+const String EST_PARADO = "PARADO";
 
 //Constantes temperatura
-const float TEMP_LAV_PRG_NORMAL = 50.0;
-const float TEMP_LAV_PRG_ECO = 45.0;
+const float TEMP_LAV_PRG_NORMAL = 55.0;
+const float TEMP_LAV_PRG_ECO = 50.0;
 const float TEMP_LAV_PRG_STRONG = 60.0;
 const float TEMP_LAV_PRG_RAPIDO = 45.0;
 const float TEMP_LAV_PRG_DELICADO = 45.0;
-const float TEMP_ABR_PRG_NORMAL = 60.0;
+const float TEMP_ABR_PRG_NORMAL = 65.0;
 const float TEMP_ABR_PRG_ECO = 60.0;
-const float TEMP_ABR_PRG_STRONG = 65.0;
+const float TEMP_ABR_PRG_STRONG = 70.0;
 const float TEMP_ABR_PRG_RAPIDO = 60.0;
 const float TEMP_ABR_PRG_DELICADO = 55.0;
 const float TEMP_OFFSET = 2.5;
 
 //Constantes tiempos
-const long TIME_REM_PRG_NORMAL = 480000;
-const long TIME_REM_PRG_ECO = 480000;
-const long TIME_REM_PRG_STRONG = 480000;
-const long TIME_REM_PRG_DELICADO = 480000;
-const long TIME_LAV_PRG_NORMAL = 600000;
-const long TIME_LAV_PRG_ECO = 600000;
-const long TIME_LAV_PRG_STRONG = 600000;
-const long TIME_LAV_PRG_RAPIDO = 600000;
-const long TIME_LAV_PRG_DELICADO = 600000;
-const long TIME_ABR_PRG_NORMAL = 900000;
-const long TIME_ABR_PRG_ECO = 900000;
-const long TIME_ABR_PRG_STRONG = 900000;
-const long TIME_ABR_PRG_RAPIDO = 900000;
-const long TIME_ABR_PRG_DELICADO = 900000;
-const long TIME_SEC_PRG_NORMAL = 1200000;
-const long TIME_SEC_PRG_ECO = 1200000;
-const long TIME_SEC_PRG_STRONG = 1200000;
-const long TIME_SEC_PRG_DELICADO = 1200000;
+const long TIME_REM_PRG_NORMAL = 420000; //7min
+const long TIME_REM_PRG_ECO = 600000; //10min
+const long TIME_REM_PRG_STRONG = 420000; //7min
+const long TIME_REM_PRG_DELICADO = 480000; //8min
+const long TIME_LAV_PRG_NORMAL = 1200000; //20min
+const long TIME_LAV_PRG_ECO = 1800000; //30min
+const long TIME_LAV_PRG_STRONG = 1200000; //20min
+const long TIME_LAV_PRG_RAPIDO = 600000; //10min
+const long TIME_LAV_PRG_DELICADO = 1200000; //20min
+const long TIME_ABR_PRG_NORMAL = 900000;//15min
+const long TIME_ABR_PRG_ECO = 1200000;//20min
+const long TIME_ABR_PRG_STRONG = 900000;//15min
+const long TIME_ABR_PRG_RAPIDO = 900000;//15min
+const long TIME_ABR_PRG_DELICADO = 1200000;//20min
+const long TIME_SEC_PRG_NORMAL = 1200000;//20min
+const long TIME_SEC_PRG_ECO = 1200000;//20min
+const long TIME_SEC_PRG_STRONG = 1200000;//20min
+const long TIME_SEC_PRG_DELICADO = 1200000;//20min
 const long TIME_VACIADO_SECADO = 10000;
 
 //Constantes programas
@@ -155,6 +156,10 @@ void setup() {
   for (byte i = 2; i <= 7; i++)
     pinMode(i, OUTPUT);
 
+  //AÑADIDO PARA PRUEBAS SIN CALENTAR
+  pinMode(13, OUTPUT);
+  digitalWrite(3, LOW);
+
   //Temporizadores:
   tVaciado = new TON(30000);
   tDisplayErrores = new TON(3000);
@@ -162,8 +167,8 @@ void setup() {
   tMaximoNivelAgua = new TON(300000);
   tActivoNivelAgua = new TON(3000);
   tCiclo = new TON(1200000);
-  tConfirmarPrograma = new TON(3000);
-  tRefrescoDisplay = new TON(2000);
+  tConfirmarPrograma = new TON(2000);
+  tRefrescoDisplay = new TON(1000);
 
   //Switches
   sensorNivel = new Switches(50, sNivel);
@@ -182,10 +187,12 @@ void setup() {
   lcd.print("FAGOR");
   while (!Serial);
   clearErrors();
+
+  checkNivelSal();
 }
 
 void loop() {
-  if (condicionesIniciales() && !marcha && pulsadorMarcha->buttonMode(invertir) && !aparatoError) {
+  if (!marcha && condicionesIniciales() && pulsadorMarcha->buttonMode(invertir) && !aparatoError) {
     while (pulsadorMarcha->buttonMode(invertir)) {
       if (tConfirmarPrograma->IN(activar)) {
         marcha = true;
@@ -196,21 +203,22 @@ void loop() {
     if (!marcha) {
       seleccionPrograma++;
       Serial.println("Seleccionar programa");
-      switch (seleccionPrograma) {
-        case 1:
-          printLine(PROGRAMA_ECO, PRIMERA_LINEA);
-          break;
-        case 2:
-          printLine(PROGRAMA_NORMAL, PRIMERA_LINEA);
-          break;
-        default:
-          printLine(PROGRAMA_ESPERA, PRIMERA_LINEA);
-          seleccionPrograma = 0;
-          break;
-      }
     }
   }
   tConfirmarPrograma->IN(resetTimer);
+
+  switch (seleccionPrograma) {
+    case 1:
+      printLine(PROGRAMA_ECO, PRIMERA_LINEA);
+      break;
+    case 2:
+      printLine(PROGRAMA_NORMAL, PRIMERA_LINEA);
+      break;
+    default:
+      printLine(PROGRAMA_ESPERA, PRIMERA_LINEA);
+      seleccionPrograma = 0;
+      break;
+  }
 
   if (marcha && sensorPuerta->switchMode(real) && !aparatoError) {
     Serial.println("Arranque");
@@ -243,10 +251,11 @@ void loop() {
   if (tDisplayErrores->IN(activar)) {
     checkSondaTemperatura();
     checkFugas();
-    checkNivelSal();
+    //checkNivelSal();
 
     if (showErrors()) {
       Serial.println("Hay errores");
+      parar();
       aparatoError = true;
       etapa = 0;
     }

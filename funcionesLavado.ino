@@ -6,29 +6,40 @@ bool llenado(bool regeneracion) {
       digitalWrite(regeneracionSal, LOW);
       digitalWrite(mRecirculacion, HIGH);
 
+      tActivoNivelAgua->IN(resetTimer);
+
+      Serial.println("Lleno");
+
       if (!flagActivoNivel) {
         tMaximoNivelAgua->IN(resetTimer);
         tNivelAgua->IN(resetTimer);
         tActivoNivelAgua->IN(resetTimer);
+        Serial.println("Fin llenado");
         return true;
       }
     } else {
       digitalWrite(EV_EntradaAgua, HIGH);
 
+      Serial.println("Llenando");
+
       if (regeneracion) {
         digitalWrite(regeneracionSal, HIGH);
+        Serial.println("Regenerando");
       }
       if (tNivelAgua->IN(activar)) {
         setError(CHAR_ERROR_NIVEL_AGUA);
         tMaximoNivelAgua->IN(resetTimer);
         tActivoNivelAgua->IN(resetTimer);
         tNivelAgua->IN(resetTimer);
+        Serial.println(ERROR_NIVEL_AGUA);
 
         return false;
       }
 
       flagActivoNivel = tActivoNivelAgua->IN(activar);
     }
+
+    printLine(CICLO_LLENANDO, SEGUNDA_LINEA);
 
     return false;
 
@@ -58,12 +69,13 @@ bool vaciado() {
     tVaciado->IN(resetTimer);
 
     return true;
-  }
-
-  else {
+    
+  } else {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(bVaciado, HIGH);
 
+    printLine(CICLO_VACIANDO, SEGUNDA_LINEA);
+    
     return false;
   }
 }
@@ -75,11 +87,13 @@ void parar() {
   digitalWrite(bVaciado, LOW);
   digitalWrite(aAbrillantador, LOW);
   digitalWrite(regeneracionSal, LOW);
+
+  printLine(EST_PARADO, SEGUNDA_LINEA);
 }
 
 void calentar(float temperaturaConsigna) {
   float temperaturaActual = calculoNTC();
-
+  Serial.println("Calentando");
   if (temperaturaActual < temperaturaConsigna - TEMP_OFFSET) {
     digitalWrite(mRecirculacion, HIGH);
     digitalWrite(calentador, HIGH);
