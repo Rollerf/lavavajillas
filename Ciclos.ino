@@ -1,13 +1,17 @@
 bool remojado() {
   if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
+
     tCiclo->IN(resetTimer);
 
-    return false;
+    return true;
+
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(calentador, LOW);
     digitalWrite(mRecirculacion, HIGH);
+
+    printLine(CICLO_LLENANDO, SEGUNDA_LINEA);
 
     return false;
   }
@@ -15,14 +19,20 @@ bool remojado() {
 
 bool lavado(float temperatura) {
   if (tCiclo->IN(activar)) {
+    digitalWrite(calentador, LOW);
     digitalWrite(mRecirculacion, LOW);
+
     tCiclo->IN(resetTimer);
 
-    return false;
+    return true;
+
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(mRecirculacion, HIGH);
+
     calentar(temperatura);
+
+    printLine(CICLO_LAVANDO, SEGUNDA_LINEA);
 
     return false;
   }
@@ -31,30 +41,38 @@ bool lavado(float temperatura) {
 bool abrillantado(float temperatura) {
   if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
+    digitalWrite(calentador, LOW);
     digitalWrite(aAbrillantador, LOW);
+
     tCiclo->IN(resetTimer);
 
     return false;
+
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(mRecirculacion, HIGH);
     digitalWrite(aAbrillantador, HIGH);
+
     calentar(temperatura);
+
+    printLine(CICLO_ABRILLANTANDO, SEGUNDA_LINEA);
 
     return false;
   }
 }
 
-bool secado(float temperatura) {
+bool secado() {
   if (tCiclo->IN(activar)) {
-    digitalWrite(mRecirculacion, LOW);
     tCiclo->IN(resetTimer);
 
     return false;
+
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
-    digitalWrite(mRecirculacion, HIGH);
-    calentar(temperatura);
+    digitalWrite(mRecirculacion, LOW);
+    digitalWrite(calentador, LOW);
+
+    printLine(CICLO_SECANDO, SEGUNDA_LINEA);
 
     return false;
   }

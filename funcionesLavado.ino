@@ -76,3 +76,18 @@ void parar() {
   digitalWrite(aAbrillantador, LOW);
   digitalWrite(regeneracionSal, LOW);
 }
+
+void calentar(float temperaturaConsigna) {
+  float temperaturaActual = calculoNTC();
+
+  if (temperaturaActual < temperaturaConsigna - TEMP_OFFSET) {
+    digitalWrite(mRecirculacion, HIGH);
+    digitalWrite(calentador, HIGH);
+
+    String temperaturaImprimir = TEMP_ACTUAL + String(temperaturaActual, 2);
+
+    printLine(temperaturaImprimir, SEGUNDA_LINEA);
+  } else if (temperaturaActual  > temperaturaConsigna + TEMP_OFFSET) {
+    digitalWrite(calentador, LOW);
+  }
+}

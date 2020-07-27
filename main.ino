@@ -13,19 +13,19 @@ TON* tMaximoNivelAgua;
 TON* tConfirmarPrograma;
 TON* tActivoNivelAgua;
 TON* tCiclo;
+TON* tRefrescoDisplay;
 
 //Entradas
 Switches* sensorNivel;
 Switches* pulsadorMarcha;
-Switches* interruptorPrograma1;
-Switches* interruptorPrograma2;
 Switches* sensorFugas;
 Switches* sensorPuerta;
+Switches* sensorSal;
 
 //Pantalla
 LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 16 chars and 2 line display
 
-//Entradas Digitales
+//Entradas digitales
 #define pMarcha 8
 #define sPuerta 9
 #define sNivel 10
@@ -90,14 +90,59 @@ const String ERROR_NIVEL_AGUA = "Timeout nivel agua";
 //Constantes mensajes proceso
 const String PROGRAMA_ECO = "PRG ECO";
 const String PROGRAMA_NORMAL = "PRG NORMAL";
+const String PROGRAMA_STRONG = "PRG STRONG";
+const String PROGRAMA_RAPIDO = "PRG RAPIDO";
+const String PROGRAMA_DELICADO = "PRG DELICADO";
 const String PROGRAMA_ESPERA = "ESPERA PRG";
 const String PROGRAMA_FINALIZADO = "FIN DEL PROGRAMA";
+const String TEMP_ACTUAL = "Temperatura: ";
+const String FALTA_SAL = "Falta Sal";
+const String CICLO_LLENANDO = "LLENANDO";
+const String CICLO_VACIANDO = "VACIADO";
+const String CICLO_REMOJANDO = "REMOJANDO";
+const String CICLO_LAVANDO = "LAVANDO";
+const String CICLO_ABRILLANTANDO = "ABRILLANTANDO";
+const String CICLO_SECANDO = "SECANDO";
 
 //Constantes temperatura
-const float SEVENTY = 70.0;
-const float SIXTY = 60.0;
-const float FIFTY = 50.0;
-const float FORTY_FIVE = 45.0;
+const float TEMP_LAV_PRG_NORMAL = 50.0;
+const float TEMP_LAV_PRG_ECO = 45.0;
+const float TEMP_LAV_PRG_STRONG = 60.0;
+const float TEMP_LAV_PRG_RAPIDO = 45.0;
+const float TEMP_LAV_PRG_DELICADO = 45.0;
+const float TEMP_ABR_PRG_NORMAL = 60.0;
+const float TEMP_ABR_PRG_ECO = 60.0;
+const float TEMP_ABR_PRG_STRONG = 65.0;
+const float TEMP_ABR_PRG_RAPIDO = 60.0;
+const float TEMP_ABR_PRG_DELICADO = 55.0;
+const float TEMP_OFFSET = 2.5;
+
+//Constantes tiempos
+const long TIME_REM_PRG_NORMAL = 480000;
+const long TIME_REM_PRG_ECO = 480000;
+const long TIME_REM_PRG_STRONG = 480000;
+const long TIME_REM_PRG_DELICADO = 480000;
+const long TIME_LAV_PRG_NORMAL = 600000;
+const long TIME_LAV_PRG_ECO = 600000;
+const long TIME_LAV_PRG_STRONG = 600000;
+const long TIME_LAV_PRG_RAPIDO = 600000;
+const long TIME_LAV_PRG_DELICADO = 600000;
+const long TIME_ABR_PRG_NORMAL = 900000;
+const long TIME_ABR_PRG_ECO = 900000;
+const long TIME_ABR_PRG_STRONG = 900000;
+const long TIME_ABR_PRG_RAPIDO = 900000;
+const long TIME_ABR_PRG_DELICADO = 900000;
+const long TIME_SEC_PRG_NORMAL = 1200000;
+const long TIME_SEC_PRG_ECO = 1200000;
+const long TIME_SEC_PRG_STRONG = 1200000;
+const long TIME_SEC_PRG_DELICADO = 1200000;
+const long TIME_VACIADO_SECADO = 10000;
+
+//Constantes programas
+const char PRG_ECO = 'E';
+const char PRG_NORMAL = 'N';
+const char PRG_STRONG = 'S';
+const char PRG_RAPIDO = 'R';
 
 void setup() {
   //Entradas digitales:
@@ -111,19 +156,21 @@ void setup() {
     pinMode(i, OUTPUT);
 
   //Temporizadores:
-  tVaciado = new TON(40000);
+  tVaciado = new TON(30000);
   tDisplayErrores = new TON(3000);
   tNivelAgua = new TON(45000);
   tMaximoNivelAgua = new TON(300000);
   tActivoNivelAgua = new TON(3000);
   tCiclo = new TON(1200000);
   tConfirmarPrograma = new TON(3000);
+  tRefrescoDisplay = new TON(2000);
 
   //Switches
   sensorNivel = new Switches(50, sNivel);
   pulsadorMarcha = new Switches(50, pMarcha);
   sensorFugas = new Switches(50, sFugas);
   sensorPuerta = new Switches(50, sPuerta);
+  sensorSal = new Switches(50, sSal);
 
   //Comunicacion:
   Serial.begin(9600);
@@ -136,7 +183,7 @@ void setup() {
   while (!Serial);
   clearErrors();
 }
-//TODO: Arreglar problema de la temperatura
+
 void loop() {
   if (condicionesIniciales() && !marcha && pulsadorMarcha->buttonMode(invertir) && !aparatoError) {
     while (pulsadorMarcha->buttonMode(invertir)) {
@@ -167,14 +214,13 @@ void loop() {
 
   if (marcha && sensorPuerta->switchMode(real) && !aparatoError) {
     Serial.println("Arranque");
-    //TODO: Acabar el resto de programas
     //TODO: Hacer seguridades y acciones de si se abre la puerta
     //TODO: Checkear que estan todos los ciclos
     //TODO: Modificar nombre de constantes por nombres en mayuscula separados con _
     //TODO: Poner falses para poder probar el programa por partes
     switch (seleccionPrograma) {
       case 1:
-        finPrograma = eco();
+        finPrograma = prgLavado(PRG_ECO);
         Serial.println("Programa ECO arranque");
         break;
 
@@ -197,11 +243,14 @@ void loop() {
   if (tDisplayErrores->IN(activar)) {
     checkSondaTemperatura();
     checkFugas();
+    checkNivelSal();
+
     if (showErrors()) {
       Serial.println("Hay errores");
       aparatoError = true;
       etapa = 0;
     }
+
     tDisplayErrores->IN(resetTimer);
   }
 }

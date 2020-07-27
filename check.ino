@@ -78,3 +78,13 @@ bool checkFugas() {
     return false;
   }
 }
+
+bool checkNivelSal(){
+  if(sensorSal->switchMode(invertir)){
+    printLine(FALTA_SAL, PRIMERA_LINEA);
+    
+    return false;
+  }
+
+  return true;
+}
