@@ -85,7 +85,7 @@ const char CHAR_ERROR_NIVEL_AGUA = 'D';
 const String ERROR_FUGA_AGUA = "Fuga de agua";
 const String ERROR_SENSOR_NIVEL = "Nivel agua ALTO";
 const String ERROR_TEMPERATURA_SONDA = "Error NTC";
-const String ERROR_NIVEL_AGUA = "Timeout nivel agua";
+const String ERROR_NIVEL_AGUA = "Timeout llenado";
 
 //Constantes mensajes proceso
 const String PROGRAMA_ECO = "PRG ECO";
@@ -133,11 +133,11 @@ const long TIME_ABR_PRG_ECO = 1200000;//20min
 const long TIME_ABR_PRG_STRONG = 900000;//15min
 const long TIME_ABR_PRG_RAPIDO = 900000;//15min
 const long TIME_ABR_PRG_DELICADO = 1200000;//20min
-const long TIME_SEC_PRG_NORMAL = 1200000;//20min
-const long TIME_SEC_PRG_ECO = 1200000;//20min
-const long TIME_SEC_PRG_STRONG = 1200000;//20min
-const long TIME_SEC_PRG_DELICADO = 1200000;//20min
-const long TIME_VACIADO_SECADO = 10000;
+const long TIME_SEC_PRG_NORMAL = 600000; //10min
+const long TIME_SEC_PRG_ECO = 600000; //10min
+const long TIME_SEC_PRG_STRONG = 600000; //10min
+const long TIME_SEC_PRG_DELICADO = 600000; //10min
+const long TIME_VACIADO_SECADO = 10000;//10s
 
 //Constantes programas
 const char PRG_ECO = 'E';
@@ -165,7 +165,7 @@ void setup() {
   tDisplayErrores = new TON(3000);
   tNivelAgua = new TON(45000);
   tMaximoNivelAgua = new TON(300000);
-  tActivoNivelAgua = new TON(3000);
+  tActivoNivelAgua = new TON(1000);
   tCiclo = new TON(1200000);
   tConfirmarPrograma = new TON(2000);
   tRefrescoDisplay = new TON(1000);
@@ -221,15 +221,9 @@ void loop() {
   }
 
   if (marcha && sensorPuerta->switchMode(real) && !aparatoError) {
-    Serial.println("Arranque");
-    //TODO: Hacer seguridades y acciones de si se abre la puerta
-    //TODO: Checkear que estan todos los ciclos
-    //TODO: Modificar nombre de constantes por nombres en mayuscula separados con _
-    //TODO: Poner falses para poder probar el programa por partes
     switch (seleccionPrograma) {
       case 1:
         finPrograma = prgLavado(PRG_ECO);
-        Serial.println("Programa ECO arranque");
         break;
 
       case 2:

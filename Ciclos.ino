@@ -46,7 +46,7 @@ bool abrillantado(float temperatura) {
 
     tCiclo->IN(resetTimer);
 
-    return false;
+    return true;
 
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
@@ -65,7 +65,7 @@ bool secado() {
   if (tCiclo->IN(activar)) {
     tCiclo->IN(resetTimer);
 
-    return false;
+    return true;
 
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
