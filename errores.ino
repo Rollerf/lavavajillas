@@ -42,10 +42,12 @@ bool showErrors() {
     //    Serial.println(errorMostrar);
     if (errores[i] == CHAR_ERROR_FUGA_AGUA) {
       printLine(ERROR_FUGA_AGUA, SEGUNDA_LINEA);
+
       return true;
 
     } else if (errores[i] == CHAR_ERROR_SENSOR_NIVEL) {
       printLine(ERROR_SENSOR_NIVEL, SEGUNDA_LINEA);
+
       return true;
 
     } else if (errores[i] == CHAR_ERROR_TEMPERATURA_SONDA) {
@@ -55,6 +57,7 @@ bool showErrors() {
 
     } else if (errores[i] == CHAR_ERROR_NIVEL_AGUA) {
       printLine(ERROR_NIVEL_AGUA, SEGUNDA_LINEA);
+
       return true;
 
     }

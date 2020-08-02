@@ -14,20 +14,23 @@ bool printLine(String texto, byte linea) {
     }
   }
   if (tRefrescoDisplay->IN(activar)) {
+    Serial.println("Imprimir display");
+    Serial.println(texto);
+    Serial.println(lastTextL1);
+    Serial.println(lastTextL2);
+
     lcd.setCursor(0, linea);
     lcd.print(LINEA_VACIA);
     lcd.setCursor(0, linea);
     lcd.print(texto);
-    tRefrescoDisplay->IN(resetTimer);
+
     if (linea == 0) {
       lastTextL1 = texto;
-      Serial.println("Nuevo texto linea 1");
-
     } else if (linea == 1) {
       lastTextL2 = texto;
       Serial.println("Nuevo texto linea 2");
     }
-    Serial.println("Imprimir display");
+    tRefrescoDisplay->IN(resetTimer);
   }
 
   return true;
@@ -39,4 +42,5 @@ void resetTimers() {
   tMaximoNivelAgua->IN(resetTimer);
   tActivoNivelAgua->IN(resetTimer);
   tCiclo->IN(resetTimer);
+  tRegeneracion->IN(resetTimer);
 }

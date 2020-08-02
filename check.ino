@@ -1,4 +1,6 @@
 bool condicionesIniciales() {
+  static bool lleno;
+
   digitalWrite(EV_EntradaAgua, LOW);
   digitalWrite(calentador, LOW);
   digitalWrite(mRecirculacion, LOW);
@@ -8,13 +10,18 @@ bool condicionesIniciales() {
   //Comprobacion nivel de agua
   if (sensorNivel->switchMode(invertir)) {
     digitalWrite(EV_EntradaAgua, LOW);
-    digitalWrite(bVaciado, HIGH);
     Serial.println("Error, nivel de agua alto");
     setError(CHAR_ERROR_SENSOR_NIVEL);
+    lleno = !vaciado();
 
     return false;
+
+  } else if (lleno) {
+    lleno = !vaciado();
+
+    return !lleno;
+
   } else {
-    digitalWrite(bVaciado, LOW);
     clearError(CHAR_ERROR_SENSOR_NIVEL);
   }
 
@@ -26,19 +33,23 @@ bool condicionesIniciales() {
     setError(CHAR_ERROR_FUGA_AGUA);
 
     return false;
+
   } else {
     digitalWrite(bVaciado, LOW);
     clearError(CHAR_ERROR_FUGA_AGUA);
   }
 
   //Comprobacion temperatura
-  if (calculoNTC() <= 5 || calculoNTC() >= 40) {
+  float temperatura = calculoNTC();
+
+  if (temperatura <= 5 || temperatura >= 55) {
     Serial.println("Seteo error temperatura sonda");
     Serial.println("Temperatura: ");
-    Serial.println(calculoNTC());
+    Serial.println(temperatura);
     setError(CHAR_ERROR_TEMPERATURA_SONDA);
 
     return false;
+
   } else {
     clearError(CHAR_ERROR_FUGA_AGUA);
   }
@@ -54,6 +65,7 @@ bool checkSondaTemperatura() {
   if (temperatura <= 5.0 || temperatura >= 80.0) {
     setError(CHAR_ERROR_TEMPERATURA_SONDA);
     Serial.println("Seteo error temperatura sonda");
+
     return false;
   }
 
@@ -81,10 +93,10 @@ bool checkFugas() {
   }
 }
 
-bool checkNivelSal(){
-  if(sensorSal->switchMode(invertir)){
+bool checkNivelSal() {
+  if (sensorSal->switchMode(invertir)) {
     printLine(FALTA_SAL, PRIMERA_LINEA);
-    
+
     return false;
   }
 
