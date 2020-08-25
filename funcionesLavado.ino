@@ -18,7 +18,7 @@ bool llenado(bool regeneracion) {
       if (tActivoNivelAgua->IN(activar)) {
         tMaximoNivelAgua->IN(resetTimer);
         tActivoNivelAgua->IN(resetTimer);
-        Serial.println("Fin llenado");
+        //Serial.println("Fin llenado");
         return true;
       }
     } else {
@@ -31,18 +31,18 @@ bool llenado(bool regeneracion) {
       //Se da por finalizado el llenado
       tActivoNivelAgua->IN(resetTimer);
 
-      //Serial.println("Llenando");
+      ////Serial.println("Llenando");
 
       if (regeneracion && !tRegeneracion->IN(activar)) {
         digitalWrite(regeneracionSal, HIGH);
-        Serial.println("Regenerando");
+        //Serial.println("Regenerando");
       }
       if (tNivelAgua->IN(activar)) {
         setError(CHAR_ERROR_NIVEL_AGUA);
         tMaximoNivelAgua->IN(resetTimer);
         tActivoNivelAgua->IN(resetTimer);
         tNivelAgua->IN(resetTimer);
-        Serial.println("Error tNivelAgua");
+        //Serial.println("Error tNivelAgua");
 
         return false;
       }
@@ -58,7 +58,7 @@ bool llenado(bool regeneracion) {
     tNivelAgua->IN(resetTimer);
     tActivoNivelAgua->IN(resetTimer);
 
-    Serial.println("Error tMaximoNivelAgua");
+    //Serial.println("Error tMaximoNivelAgua");
     return false;
   }
 
@@ -84,7 +84,7 @@ bool vaciado() {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(bVaciado, HIGH);
 
-    Serial.println("Vaciando");
+    //Serial.println("Vaciando");
 
     printLine(CICLO_VACIANDO, SEGUNDA_LINEA);
 

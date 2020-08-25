@@ -14,10 +14,13 @@ bool printLine(String texto, byte linea) {
     }
   }
   if (tRefrescoDisplay->IN(activar)) {
-    Serial.println("Imprimir display");
-    Serial.println(texto);
-    Serial.println(lastTextL1);
-    Serial.println(lastTextL2);
+    //Serial.println("Imprimir display");
+    //Serial.println("Entrada texto: ");
+    //Serial.print(texto);
+    //Serial.println("Texto anterior linea 1: ");
+    //Serial.print(lastTextL1);
+    //Serial.println("Texto anterior linea 2: ");
+    //Serial.print(lastTextL2);
 
     lcd.setCursor(0, linea);
     lcd.print(LINEA_VACIA);
@@ -28,7 +31,6 @@ bool printLine(String texto, byte linea) {
       lastTextL1 = texto;
     } else if (linea == 1) {
       lastTextL2 = texto;
-      Serial.println("Nuevo texto linea 2");
     }
     tRefrescoDisplay->IN(resetTimer);
   }

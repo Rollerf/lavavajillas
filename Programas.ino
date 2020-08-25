@@ -4,6 +4,8 @@ bool prgLavado(char programaSeleccionado) {
   unsigned long tiempoAbrillantado;
   unsigned long tiempoSecado;
   unsigned long tiempoEspera;
+  unsigned long tiempoPararCalentarLavado;
+  unsigned long tiempoPararCalentarAbrillantado;
   float temperaturaLavado;
   float temperaturaAbrillantado;
 
@@ -13,9 +15,12 @@ bool prgLavado(char programaSeleccionado) {
       tiempoLavado = TIME_LAV_PRG_ECO;
       tiempoAbrillantado = TIME_ABR_PRG_ECO;
       tiempoSecado = TIME_SEC_PRG_ECO;
+      tiempoEspera = TIME_ESP;
+      tiempoPararCalentarLavado = TIME_LAV_STOP_HEAT_PRG_ECO;
+      tiempoPararCalentarAbrillantado = TIME_ABR_STOP_HEAT_PRG_ECO;
       temperaturaLavado = TEMP_LAV_PRG_ECO;
       temperaturaAbrillantado = TEMP_ABR_PRG_ECO;
-      tiempoEspera = TEMP_ESP;
+
 
       break;
 
@@ -24,9 +29,11 @@ bool prgLavado(char programaSeleccionado) {
       tiempoLavado = TIME_LAV_PRG_NORMAL;
       tiempoAbrillantado = TIME_ABR_PRG_NORMAL;
       tiempoSecado = TIME_SEC_PRG_NORMAL;
+      tiempoEspera = TIME_ESP;
+      tiempoPararCalentarLavado = TIME_LAV_STOP_HEAT_PRG_NORMAL;
+      tiempoPararCalentarAbrillantado = TIME_ABR_STOP_HEAT_PRG_NORMAL;
       temperaturaLavado = TEMP_LAV_PRG_NORMAL;
       temperaturaAbrillantado = TEMP_ABR_PRG_NORMAL;
-      tiempoEspera = TEMP_ESP;
 
       break;
 
@@ -35,9 +42,11 @@ bool prgLavado(char programaSeleccionado) {
       tiempoLavado = TIME_LAV_PRG_STRONG;
       tiempoAbrillantado = TIME_ABR_PRG_STRONG;
       tiempoSecado = TIME_SEC_PRG_STRONG;
+      tiempoEspera = TIME_ESP;
+      tiempoPararCalentarLavado = TIME_LAV_STOP_HEAT_PRG_STRONG;
+      tiempoPararCalentarAbrillantado = TIME_ABR_STOP_HEAT_PRG_STRONG;
       temperaturaLavado = TEMP_LAV_PRG_STRONG;
       temperaturaAbrillantado = TEMP_ABR_PRG_STRONG;
-      tiempoEspera = TEMP_ESP;
 
       break;
 
@@ -46,9 +55,11 @@ bool prgLavado(char programaSeleccionado) {
       tiempoLavado = TIME_LAV_PRG_RAPIDO;
       tiempoAbrillantado = TIME_ABR_PRG_RAPIDO;
       tiempoSecado = 0;
+      tiempoEspera = TIME_ESP;
+      tiempoPararCalentarLavado = TIME_LAV_STOP_HEAT_PRG_RAPIDO;
+      tiempoPararCalentarAbrillantado = TIME_ABR_STOP_HEAT_PRG_RAPIDO;
       temperaturaLavado = TEMP_LAV_PRG_RAPIDO;
       temperaturaAbrillantado = TEMP_ABR_PRG_RAPIDO;
-      tiempoEspera = TEMP_ESP;
 
       break;
 
@@ -57,9 +68,11 @@ bool prgLavado(char programaSeleccionado) {
       tiempoLavado = TIME_LAV_PRG_DELICADO;
       tiempoAbrillantado = TIME_ABR_PRG_DELICADO;
       tiempoSecado = TIME_SEC_PRG_DELICADO;
+      tiempoEspera = TIME_ESP;
+      tiempoPararCalentarLavado = TIME_LAV_STOP_HEAT_PRG_DELICADO;
+      tiempoPararCalentarAbrillantado = TIME_ABR_STOP_HEAT_PRG_DELICADO;
       temperaturaLavado = TEMP_LAV_PRG_DELICADO;
       temperaturaAbrillantado = TEMP_ABR_PRG_DELICADO;
-      tiempoEspera = TEMP_ESP;
 
       break;
   }
@@ -68,8 +81,9 @@ bool prgLavado(char programaSeleccionado) {
     //Condiciones iniciales
     case 0:
       if (condicionesIniciales()) {
-        etapa++;
-        Serial.println("Condiciones iniciales cumplidas");
+        //etapa++;
+        etapa = 5;//TODO:Me salto el ciclo de remojado
+        //Serial.println("Condiciones iniciales cumplidas");
       }
 
       return false;
@@ -81,7 +95,7 @@ bool prgLavado(char programaSeleccionado) {
 
       } else if (llenado(regeneracionDesactivada)) { //Llenado. Etapa2
         tCiclo->setSetPoint(tiempoRemojado);
-        Serial.println("Llenado completo");
+        //Serial.println("Llenado completo");
         etapa++;
       }
 
@@ -90,7 +104,7 @@ bool prgLavado(char programaSeleccionado) {
     case 2:
       //Empezar con el primer ciclo. Etapa 2
       if (remojado()) {
-        Serial.println("Remojado completo");
+        //Serial.println("Remojado completo");
         etapa++;
         tCiclo->setSetPoint(tiempoEspera);
       }
@@ -109,7 +123,7 @@ bool prgLavado(char programaSeleccionado) {
       //Vaciado. Etapa 4
       if (vaciado()) {
         etapa++;
-        Serial.println("Vacio");
+        //Serial.println("Vacio");
       }
 
       return false;
@@ -122,17 +136,17 @@ bool prgLavado(char programaSeleccionado) {
         tCiclo->setSetPoint(tiempoLavado);
 
         etapa++;
-        Serial.println("Llenado, segundo ciclo");
+        //Serial.println("Llenado, segundo ciclo");
       }
 
       return false;
 
     case 6:
       //Empezar con el segundo ciclo. Etapa 6
-      if (lavado(temperaturaLavado)) {
+      if (lavado(temperaturaLavado, tiempoPararCalentarLavado)) {
         etapa++;
         tCiclo->setSetPoint(tiempoEspera);
-        Serial.println("Lavado completo");
+        //Serial.println("Lavado completo");
       }
 
       return false;
@@ -149,7 +163,7 @@ bool prgLavado(char programaSeleccionado) {
       //Vaciado. Etapa 8
       if (vaciado()) {
         etapa++;
-        Serial.println("Vacio");
+        //Serial.println("Vacio");
       }
 
       return false;
@@ -162,17 +176,17 @@ bool prgLavado(char programaSeleccionado) {
         tCiclo->setSetPoint(tiempoAbrillantado);
 
         etapa++;
-        Serial.println("Llenado, tercer ciclo");
+        //Serial.println("Llenado, tercer ciclo");
       }
 
       return false;
 
     case 10:
       //Etapa 10
-      if (abrillantado(temperaturaAbrillantado)) {
+      if (abrillantado(temperaturaAbrillantado, tiempoPararCalentarAbrillantado)) {
         etapa++;
         tCiclo->setSetPoint(tiempoEspera);
-        Serial.println("Abrillantado completo");
+        //Serial.println("Abrillantado completo");
       }
 
       return false;
@@ -189,7 +203,7 @@ bool prgLavado(char programaSeleccionado) {
       //Vaciado. Etapa 12
       if (vaciado()) {
         etapa++;
-        Serial.println("Vacio");
+        //Serial.println("Vacio");
       }
 
       return false;
@@ -213,7 +227,7 @@ bool prgLavado(char programaSeleccionado) {
         tVaciado->setSetPoint(TIME_VACIADO_SECADO);
 
         etapa++;
-        Serial.println("Secado completo");
+        //Serial.println("Secado completo");
       }
 
       return false;

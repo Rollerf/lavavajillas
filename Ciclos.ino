@@ -17,7 +17,7 @@ bool remojado() {
   }
 }
 
-bool lavado(float temperatura) {
+bool lavado(float temperatura, long tiempoPararCalentarLavado) {
   if (tCiclo->IN(activar)) {
     digitalWrite(calentador, LOW);
     digitalWrite(mRecirculacion, LOW);
@@ -30,7 +30,7 @@ bool lavado(float temperatura) {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(mRecirculacion, HIGH);
 
-    if (tCiclo->getSetPoint() - tCiclo->getCurrentTime() < TIME_LAV_STOP_HEAT) {
+    if (tCiclo->getSetPoint() - tCiclo->getCurrentTime() < tiempoPararCalentarLavado) {
       digitalWrite(calentador, LOW);
     } else {
       calentar(temperatura);
@@ -42,7 +42,7 @@ bool lavado(float temperatura) {
   }
 }
 
-bool abrillantado(float temperatura) {
+bool abrillantado(float temperatura, long tiempoPararCalentarAbrillantado) {
   if (tCiclo->IN(activar)) {
     digitalWrite(mRecirculacion, LOW);
     digitalWrite(calentador, LOW);
@@ -56,7 +56,7 @@ bool abrillantado(float temperatura) {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(mRecirculacion, HIGH);
 
-    if (tCiclo->getSetPoint() - tCiclo->getCurrentTime() < TIME_ABR_STOP_HEAT) {
+    if (tCiclo->getSetPoint() - tCiclo->getCurrentTime() < tiempoPararCalentarAbrillantado) {
       digitalWrite(calentador, LOW);
     } else {
       if (calentar(temperatura)) { //Cuando ya cogio temperatura, abro el abrillantador

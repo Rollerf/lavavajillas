@@ -10,7 +10,7 @@ bool condicionesIniciales() {
   //Comprobacion nivel de agua
   if (sensorNivel->switchMode(invertir)) {
     digitalWrite(EV_EntradaAgua, LOW);
-    Serial.println("Error, nivel de agua alto");
+    //Serial.println("Error, nivel de agua alto");
     setError(CHAR_ERROR_SENSOR_NIVEL);
     lleno = !vaciado();
 
@@ -29,7 +29,7 @@ bool condicionesIniciales() {
   if (sensorFugas->switchMode(real)) {
     digitalWrite(EV_EntradaAgua, LOW);
     vaciado();
-    Serial.println("Error, fuga de agua");
+    //Serial.println("Error, fuga de agua");
     setError(CHAR_ERROR_FUGA_AGUA);
 
     return false;
@@ -43,9 +43,9 @@ bool condicionesIniciales() {
   float temperatura = calculoNTC();
 
   if (temperatura <= 5 || temperatura >= 55) {
-    Serial.println("Seteo error temperatura sonda");
-    Serial.println("Temperatura: ");
-    Serial.println(temperatura);
+    //Serial.println("Seteo error temperatura sonda");
+    //Serial.println("Temperatura: ");
+    //Serial.println(temperatura);
     setError(CHAR_ERROR_TEMPERATURA_SONDA);
 
     return false;
@@ -60,11 +60,11 @@ bool condicionesIniciales() {
 //Checkear sonda de temperatura. Que no tenga error
 bool checkSondaTemperatura() {
   float temperatura = calculoNTC();
-  Serial.print("checkTemperatura:");
-  Serial.println(temperatura);
+  //Serial.print("checkTemperatura:");
+  //Serial.println(temperatura);
   if (temperatura <= 5.0 || temperatura >= 80.0) {
     setError(CHAR_ERROR_TEMPERATURA_SONDA);
-    Serial.println("Seteo error temperatura sonda");
+    //Serial.println("Seteo error temperatura sonda");
 
     return false;
   }
@@ -78,7 +78,7 @@ bool checkFugas() {
   if (sensorFugas->switchMode(real) && !vacio) {
     digitalWrite(EV_EntradaAgua, LOW);
     vacio = vaciado();
-    Serial.println("Error, fuga de agua");
+    //Serial.println("Error, fuga de agua");
     setError(CHAR_ERROR_FUGA_AGUA);
 
     return true;
