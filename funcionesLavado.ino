@@ -53,15 +53,22 @@ bool llenado(bool regeneracion) {
     return false;
 
   } else {
-    setError(CHAR_ERROR_NIVEL_AGUA);
-    tMaximoNivelAgua->IN(resetTimer);
-    tNivelAgua->IN(resetTimer);
-    tActivoNivelAgua->IN(resetTimer);
+    if (sensorNivel->switchMode(invertir)) {
+      digitalWrite(EV_EntradaAgua, LOW);
+      digitalWrite(regeneracionSal, LOW);
+      digitalWrite(mRecirculacion, HIGH);
 
-    //Serial.println("Error tMaximoNivelAgua");
-    return false;
+      return true;
+      
+    } else {
+      setError(CHAR_ERROR_NIVEL_AGUA);
+      tMaximoNivelAgua->IN(resetTimer);
+      tNivelAgua->IN(resetTimer);
+      tActivoNivelAgua->IN(resetTimer);
+
+      return false;
+    }
   }
-
 }
 //Vacia durante un tiempo.
 //Devuelve true pasado ese tiempo si el sensor no detecta nivel de agua

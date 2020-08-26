@@ -174,7 +174,7 @@ void setup() {
   parar();
 
   //Temporizadores:
-  tVaciado = new TON(30000);
+  tVaciado = new TON(20000);
   tDisplayErrores = new TON(3000);
   tNivelAgua = new TON(60000);
   tMaximoNivelAgua = new TON(900000);
