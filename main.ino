@@ -71,14 +71,15 @@ const byte SEGUNDA_LINEA = 1;
 const String LINEA_VACIA = "                ";
 
 //Errores
-byte const erroresLength = 3;
-char* errores[] = {0, 0, 0, 0};
+byte const erroresLength = 4;
+char* errores[] = {0, 0, 0, 0, 0};
 bool aparatoError = false;
 
 const char CHAR_ERROR_FUGA_AGUA = 'A';
 const char CHAR_ERROR_SENSOR_NIVEL = 'B';
 const char CHAR_ERROR_TEMPERATURA_SONDA = 'C';
 const char CHAR_ERROR_NIVEL_AGUA = 'D';
+const char CHAR_ERROR_FILTRO_SUCIO = 'E';
 
 //Constantes mensajes error
 //OJO:No pueden tener mas de 16 caracteres
@@ -86,6 +87,8 @@ const String ERROR_FUGA_AGUA = "Fuga de agua";
 const String ERROR_SENSOR_NIVEL = "Nivel agua ALTO";
 const String ERROR_TEMPERATURA_SONDA = "Error NTC";
 const String ERROR_NIVEL_AGUA = "Timeout llenado";
+const String ERROR_FILTRO_SUCIO = "Filtro sucio";
+const String ERROR_NIVEL_SAL = "Sin sal";
 
 //Constantes mensajes proceso
 const String PROGRAMA_ECO = "PRG ECO";
@@ -96,7 +99,6 @@ const String PROGRAMA_DELICADO = "PRG DELICADO";
 const String PROGRAMA_ESPERA = "ESPERA PRG";
 const String PROGRAMA_FINALIZADO = "FIN PROGRAMA";
 const String TEMP_ACTUAL = "Temp: ";
-const String FALTA_SAL = "Falta Sal";
 const String CICLO_LLENANDO = "LLENANDO";
 const String CICLO_VACIANDO = "VACIANDO";
 const String CICLO_REMOJANDO = "REMOJANDO";
@@ -182,7 +184,7 @@ void setup() {
   tCiclo = new TON(1200000);
   tConfirmarPrograma = new TON(2000);
   tRefrescoDisplay = new TON(1000);
-  tRegeneracion = new TON(10000);
+  tRegeneracion = new TON(20000);
 
   //Switches
   sensorNivel = new Switches(500, sNivel);
@@ -201,7 +203,6 @@ void setup() {
   lcd.print("FAGOR");
   //while (!Serial);
   clearErrors();
-
   checkNivelSal();
 
   while (!condicionesIniciales());
@@ -295,12 +296,10 @@ void loop() {
     printLine(PROGRAMA_FINALIZADO, SEGUNDA_LINEA);
   }
 
-  //Checkear errores durante todo el programa
   if (tDisplayErrores->IN(activar)) {
     checkSondaTemperatura();
     checkFugas();
-    //checkNivelSal();
-
+    checkNivelSal();
     if (showErrors()) {
       //Serial.println("Hay errores");
       parar();

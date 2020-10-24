@@ -35,7 +35,6 @@ void clearErrors() {
 }
 
 bool showErrors() {
-  //TODO:Hacer que de alguna manera vayan rotando y mostrandose todos los errores
   for (int i = 0; i <= erroresLength; i++) {
     char errorMostrar = errores[i];
     //    //Serial.print("Error a mostrar: ");
@@ -57,6 +56,11 @@ bool showErrors() {
 
     } else if (errores[i] == CHAR_ERROR_NIVEL_AGUA) {
       printLine(ERROR_NIVEL_AGUA, SEGUNDA_LINEA);
+
+      return true;
+
+    } else if (errores[i] == CHAR_ERROR_FILTRO_SUCIO) {
+      printLine(ERROR_FILTRO_SUCIO, SEGUNDA_LINEA);
 
       return true;
 

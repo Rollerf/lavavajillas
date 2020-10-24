@@ -1,5 +1,4 @@
 bool llenado(bool regeneracion) {
-  //TODO: Poder detectar filtro sucio con un tiempo o algo
   //Si se supera el tiempo maximo estimado para un llenado, se para la maquina y da error
   if (!tMaximoNivelAgua->IN(activar)) {
     //Si se activa el sensor de nivel, se para la entrada de agua y se arranca el motor de recirculacion
@@ -9,11 +8,8 @@ bool llenado(bool regeneracion) {
       digitalWrite(mRecirculacion, HIGH);
 
       //Reseteo el temporizador de nivel activo
-      //tActivoNivelAgua->IN(resetTimer);
       tNivelAgua->IN(resetTimer);
 
-      //if (flagActivoNivel) {
-      //Si no cambia el nivel durante el tiempo indicado,
       //Se da por finalizado el llenado
       if (tActivoNivelAgua->IN(activar)) {
         tMaximoNivelAgua->IN(resetTimer);
@@ -23,12 +19,6 @@ bool llenado(bool regeneracion) {
       }
     } else {
       digitalWrite(EV_EntradaAgua, HIGH);
-      //Si el llenado dura menos que el tiempo indicado,
-      //se da por finalizado el llenado
-      //flagActivoNivel = !tActivoNivelAgua->IN(activar);
-
-      //Si no cambia el nivel durante el tiempo indicado,
-      //Se da por finalizado el llenado
       tActivoNivelAgua->IN(resetTimer);
 
       ////Serial.println("Llenando");
@@ -59,7 +49,7 @@ bool llenado(bool regeneracion) {
       digitalWrite(mRecirculacion, HIGH);
 
       return true;
-      
+
     } else {
       setError(CHAR_ERROR_NIVEL_AGUA);
       tMaximoNivelAgua->IN(resetTimer);
@@ -79,6 +69,7 @@ bool vaciado() {
 
     if (sensorNivel->switchMode(true)) {
       setError(CHAR_ERROR_NIVEL_AGUA);
+      setError(CHAR_ERROR_FILTRO_SUCIO);
 
       return false;
     }

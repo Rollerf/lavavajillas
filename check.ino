@@ -12,6 +12,7 @@ bool condicionesIniciales() {
     digitalWrite(EV_EntradaAgua, LOW);
     //Serial.println("Error, nivel de agua alto");
     setError(CHAR_ERROR_SENSOR_NIVEL);
+    setError(CHAR_ERROR_FILTRO_SUCIO);
     lleno = !vaciado();
 
     return false;
@@ -23,6 +24,7 @@ bool condicionesIniciales() {
 
   } else {
     clearError(CHAR_ERROR_SENSOR_NIVEL);
+    clearError(CHAR_ERROR_FILTRO_SUCIO);
   }
 
   //Comprobacion fuga de agua
@@ -95,7 +97,7 @@ bool checkFugas() {
 
 bool checkNivelSal() {
   if (sensorSal->switchMode(invertir)) {
-    printLine(FALTA_SAL, PRIMERA_LINEA);
+    printLine(ERROR_NIVEL_SAL, PRIMERA_LINEA);
 
     return false;
   }

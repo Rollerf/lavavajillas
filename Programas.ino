@@ -81,8 +81,8 @@ bool prgLavado(char programaSeleccionado) {
     //Condiciones iniciales
     case 0:
       if (condicionesIniciales()) {
-        //etapa++;
-        etapa = 5;//TODO:Me salto el ciclo de remojado
+        //etapa++; Comento esto por que por el momento, 23/10/2020, este ciclo segun pruebas realizadas es inecesario
+        etapa = 5;
         //Serial.println("Condiciones iniciales cumplidas");
       }
 
@@ -172,7 +172,7 @@ bool prgLavado(char programaSeleccionado) {
 
     case 9:
       //Llenado. Etapa 9
-      if (llenado(regeneracionDesactivada)) {
+      if (llenado(regeneracionActivada)) {
         tCiclo->setSetPoint(tiempoAbrillantado);
 
         etapa++;
@@ -209,7 +209,6 @@ bool prgLavado(char programaSeleccionado) {
       return false;
 
     //Ciclo secado
-
     case 13:
       if (programaSeleccionado == PRG_RAPIDO) {
         etapa = 20;
