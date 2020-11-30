@@ -124,22 +124,22 @@ const float TEMP_ABR_PRG_DELICADO = 40.0;
 const float TEMP_OFFSET = 2.5;
 
 //Constantes tiempos
-const long TIME_REM_PRG_NORMAL = 420000; //7min
+const long TIME_REM_PRG_NORMAL = 600000; //10min
 const long TIME_REM_PRG_ECO = 600000; //10min
-const long TIME_REM_PRG_STRONG = 420000; //7min
+const long TIME_REM_PRG_STRONG = 600000; //10min
 const long TIME_REM_PRG_DELICADO = 480000; //8min
 const long TIME_LAV_PRG_NORMAL = 1200000; //20min
-const long TIME_LAV_PRG_ECO = 2100000;//35min
+const long TIME_LAV_PRG_ECO = 1500000;//25min
 const long TIME_LAV_PRG_STRONG = 1200000; //20min
 const long TIME_LAV_PRG_RAPIDO = 900000; //15min
 const long TIME_LAV_PRG_DELICADO = 1200000; //20min
-const long TIME_ABR_PRG_NORMAL = 900000;//15min
+const long TIME_ABR_PRG_NORMAL = 600000;//10min
 const long TIME_ABR_PRG_ECO = 1200000;//20min
 const long TIME_ABR_PRG_STRONG = 900000;//15min
 const long TIME_ABR_PRG_RAPIDO = 600000;//10min
 const long TIME_ABR_PRG_DELICADO = 1200000;//20min
 const long TIME_SEC_PRG_NORMAL = 1200000;//20min
-const long TIME_SEC_PRG_ECO = 1800000 ;//30min
+const long TIME_SEC_PRG_ECO = 1200000 ;//30min
 const long TIME_SEC_PRG_STRONG = 1200000;//20min
 const long TIME_SEC_PRG_DELICADO = 1200000;//20min
 const long TIME_VACIADO_SECADO = 10000;//10s

@@ -81,8 +81,8 @@ bool prgLavado(char programaSeleccionado) {
     //Condiciones iniciales
     case 0:
       if (condicionesIniciales()) {
-        //etapa++; Comento esto por que por el momento, 23/10/2020, este ciclo segun pruebas realizadas es inecesario
-        etapa = 5;
+        etapa++;
+        //etapa = 5;
         //Serial.println("Condiciones iniciales cumplidas");
       }
 
@@ -103,7 +103,8 @@ bool prgLavado(char programaSeleccionado) {
 
     case 2:
       //Empezar con el primer ciclo. Etapa 2
-      if (remojado()) {
+      //if (remojado()) {
+      if (lavado(temperaturaLavado, tiempoPararCalentarLavado)) {
         //Serial.println("Remojado completo");
         etapa++;
         tCiclo->setSetPoint(tiempoEspera);
