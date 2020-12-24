@@ -13,12 +13,12 @@ bool condicionesIniciales() {
     //Serial.println("Error, nivel de agua alto");
     setError(CHAR_ERROR_SENSOR_NIVEL);
     setError(CHAR_ERROR_FILTRO_SUCIO);
-    lleno = !vaciado();
+    lleno = !vaciado(regeneracionDesactivada);
 
     return false;
 
   } else if (lleno) {
-    lleno = !vaciado();
+    lleno = !vaciado(regeneracionDesactivada);
 
     return !lleno;
 
@@ -30,7 +30,7 @@ bool condicionesIniciales() {
   //Comprobacion fuga de agua
   if (sensorFugas->switchMode(real)) {
     digitalWrite(EV_EntradaAgua, LOW);
-    vaciado();
+    vaciado(regeneracionDesactivada);
     //Serial.println("Error, fuga de agua");
     setError(CHAR_ERROR_FUGA_AGUA);
 
@@ -79,7 +79,7 @@ bool checkFugas() {
   static bool vacio;
   if (sensorFugas->switchMode(real) && !vacio) {
     digitalWrite(EV_EntradaAgua, LOW);
-    vacio = vaciado();
+    vacio = vaciado(regeneracionDesactivada);
     //Serial.println("Error, fuga de agua");
     setError(CHAR_ERROR_FUGA_AGUA);
 

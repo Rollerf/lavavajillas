@@ -122,7 +122,7 @@ bool prgLavado(char programaSeleccionado) {
 
     case 4:
       //Vaciado. Etapa 4
-      if (vaciado()) {
+      if (vaciado(regeneracionDesactivada)) {
         etapa++;
         //Serial.println("Vacio");
       }
@@ -162,7 +162,7 @@ bool prgLavado(char programaSeleccionado) {
 
     case 8:
       //Vaciado. Etapa 8
-      if (vaciado()) {
+      if (vaciado(regeneracionDesactivada)) {
         etapa++;
         //Serial.println("Vacio");
       }
@@ -202,7 +202,7 @@ bool prgLavado(char programaSeleccionado) {
 
     case 12:
       //Vaciado. Etapa 12
-      if (vaciado()) {
+      if (vaciado(regeneracionActivada)) {
         etapa++;
         //Serial.println("Vacio");
       }
@@ -234,7 +234,7 @@ bool prgLavado(char programaSeleccionado) {
 
     case 15:
       //Vaciado. Etapa 15
-      if (vaciado()) {
+      if (vaciado(regeneracionDesactivada)) {
         etapa++;
       }
 

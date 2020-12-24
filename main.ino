@@ -154,6 +154,7 @@ const long TIME_ABR_STOP_HEAT_PRG_STRONG = 300000; //5min
 const long TIME_ABR_STOP_HEAT_PRG_RAPIDO = 300000; //5min
 const long TIME_ABR_STOP_HEAT_PRG_DELICADO = 300000; //5min
 const long TIME_ESP = 300000; //5min
+const long TIME_REGENERATION_DRAINING = 15000; //15seg
 
 //Constantes programas
 const char PRG_ECO = 'E';

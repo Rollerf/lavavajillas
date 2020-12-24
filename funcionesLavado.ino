@@ -62,10 +62,11 @@ bool llenado(bool regeneracion) {
 }
 //Vacia durante un tiempo.
 //Devuelve true pasado ese tiempo si el sensor no detecta nivel de agua
-bool vaciado() {
+bool vaciado(bool regeneracion) {
 
   if (tVaciado->IN(activar)) {
     digitalWrite(bVaciado, LOW);
+    digitalWrite(regeneracionSal, LOW);
 
     if (sensorNivel->switchMode(true)) {
       setError(CHAR_ERROR_NIVEL_AGUA);
@@ -81,6 +82,12 @@ bool vaciado() {
   } else {
     digitalWrite(EV_EntradaAgua, LOW);
     digitalWrite(bVaciado, HIGH);
+
+    if(regeneracion && tVaciado->getCurrentTime() < TIME_REGENERATION_DRAINING){
+      digitalWrite(regeneracionSal, HIGH);
+    }else{
+      digitalWrite(regeneracionSal, LOW);
+    }
 
     //Serial.println("Vaciando");
 
